@@ -28,8 +28,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 	"sync"
+	"time"
 )
 
 type ZooKeeper struct {
@@ -186,7 +186,7 @@ func (zook *ZooKeeper) childrenRecursiveInternal(connection *zk.Conn, path strin
 	for i := 0; i < concurrentRequests; i++ {
 		workerID := i + 1
 		log.Debugf("Launched worker %v of %v", workerID, concurrentRequests)
-		go func(connection *zk.Conn, jobs chan string, results chan <- error) {
+		go func(connection *zk.Conn, jobs chan string, results chan<- error) {
 			for jobPath := range jobs {
 				log.Debugf("Worker %v received job %v", workerID, jobPath)
 				children, _, err := connection.Children(jobPath)
@@ -228,7 +228,7 @@ func (zook *ZooKeeper) childrenRecursiveInternal(connection *zk.Conn, path strin
 
 	for {
 		select {
-		case err := <- results:
+		case err := <-results:
 			log.Debug("One of the workers encountered an error: ", err)
 			return nil, err
 		default:
