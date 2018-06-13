@@ -175,6 +175,11 @@ func (zook *ZooKeeper) childrenRecursiveInternal(connection *zk.Conn, path strin
 	jobs := make(chan string)
 	results := make(chan error)
 
+	basePath := path
+	if basePath != "/" {
+		basePath += "/"
+	}
+
 	var recursiveChildren []string
 
 	// Send the first job
@@ -203,7 +208,7 @@ func (zook *ZooKeeper) childrenRecursiveInternal(connection *zk.Conn, path strin
 					childPath := gopath.Join(jobPath, child)
 
 					mu.Lock()
-					recursiveChildren = append(recursiveChildren, childPath)
+					recursiveChildren = append(recursiveChildren, strings.TrimPrefix(childPath, basePath))
 					mu.Unlock()
 
 					log.Debugf("Incremental child: %+v", childPath)
