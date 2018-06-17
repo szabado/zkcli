@@ -16,7 +16,8 @@ mkdir -p $release_dir
 pushd "$(dirname "$0")"
 for f in $(find . -name "*.go"); do go fmt $f; done
 
-go build -o $release_dir/zookeepercli || exit 1
+./script/build
+cp bin/zookeepercli $release_dir/
 
 if [ "$platform" = "Linux" ]; then
   pushd "$release_dir"

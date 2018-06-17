@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -e
+
+# Make sure we have the version of Go we want to depend on, either from the
+# system or one we grab ourselves.
+if ! go version | egrep -q 'go(1[.]9|1[.]10|1[.]11)' ; then
+  echo "go version is too low. Must use 1.9 or above"
+  exit 1
+fi
+
+
+# Since we want to be able to build this outside of GOPATH, we set it
+# up so it points back to us and go is none the wiser
+
+set -x
+rm -rf .gopath
+mkdir -p .gopath/src/github.com/outbrain
+ln -s "$PWD" .gopath/src/github.com/outbrain/zookeepercli
+export GOPATH=$PWD/.gopath:$GOPATH
