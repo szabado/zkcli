@@ -279,7 +279,7 @@ func (zook *ZooKeeper) createInternal(connection *zk.Conn, path string, data []b
 			if parentPath == path {
 				return returnValue, err
 			}
-			returnValue, err = zook.createInternal(connection, parentPath, []byte("zookeepercli auto-generated"), acl, force)
+			returnValue, err = zook.createInternal(connection, parentPath, []byte("zkcli auto-generated"), acl, force)
 		} else {
 			return returnValue, err
 		}
@@ -299,7 +299,7 @@ func (zook *ZooKeeper) createInternalWithACL(connection *zk.Conn, path string, d
 		returnValue, err := connection.Create(path, data, zook.flags, perms)
 		log.Debugf("create status for %s: %s, %+v", path, returnValue, err)
 		if err != nil && force && attempts < 2 {
-			returnValue, err = zook.createInternalWithACL(connection, gopath.Dir(path), []byte("zookeepercli auto-generated"), force, perms)
+			returnValue, err = zook.createInternalWithACL(connection, gopath.Dir(path), []byte("zkcli auto-generated"), force, perms)
 		} else {
 			return returnValue, err
 		}
