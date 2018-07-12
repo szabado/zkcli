@@ -6,6 +6,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	deleterCommandUse = "deleter"
+)
+
 func init() {
 	rootCmd.AddCommand(deleterCmd)
 	rootCmd.AddCommand(rmrCmd)
@@ -14,7 +18,7 @@ func init() {
 }
 
 var deleterCmd = &cobra.Command{
-	Use:  "deleter",
+	Use:  deleterCommandUse,
 	RunE: deleterExecute,
 }
 

@@ -4,14 +4,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	createrCommandUse = "creater"
+)
+
 func init() {
 	rootCmd.AddCommand(createrCmd)
 	createrCmd.PersistentFlags().StringVar(&acls, "acls", "31", "optional, csv list [1|,2|,4|,8|,16|,31]")
-
 }
 
 var createrCmd = &cobra.Command{
-	Use:  "creater",
+	Use:  createrCommandUse,
 	RunE: createrExecute,
 }
 

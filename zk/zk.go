@@ -446,15 +446,15 @@ func (zook *ZooKeeper) Delete(path string) error {
 
 // Delete recursive if has subdirectories.
 func (zook *ZooKeeper) DeleteRecursive(path string, concurrentRequests int) error {
-	result, err := zook.ChildrenRecursive(path, concurrentRequests)
+	children, err := zook.ChildrenRecursive(path, concurrentRequests)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	for i := len(result) - 1; i >= 0; i-- {
-		znode := path + "/" + result[i]
-		if err = zook.Delete(znode); err != nil {
-			log.Fatal(err)
+	for i := len(children) - 1; i >= 0; i-- {
+		child := path + "/" + children[i]
+		if err = zook.Delete(child); err != nil {
+			return err
 		}
 	}
 

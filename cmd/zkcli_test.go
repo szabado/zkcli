@@ -44,8 +44,6 @@ func TestCRUD(t *testing.T) {
 	require := r.New(t)
 	assert := a.New(t)
 
-	//logrus.SetLevel(logrus.FatalLevel)
-
 	hosts, id, err := StartServer()
 	require.NoError(err)
 	defer id.KillRemove()
@@ -125,4 +123,117 @@ func TestCRUD(t *testing.T) {
 	require.NoError(err)
 	assert.NotNil(stat)
 	assert.False(exists)
+}
+
+func TestCRUDRecurisve(t *testing.T) {
+	require := r.New(t)
+	assert := a.New(t)
+
+	hosts, id, err := StartServer()
+	require.NoError(err)
+	defer id.KillRemove()
+	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
+	defer zkConn.Close()
+
+	client = zk.NewZooKeeper()
+	client.SetServers(hosts)
+
+	const (
+		testPath = "/test/example/debugging?"
+		baseTestPath = "/test"
+		testData = "data"
+	)
+	hostsArg := strings.Join(hosts, ",")
+
+	os.Args = []string{zkcliCommandUse, createrCommandUse, testPath, testData, "--" + serverFlag, hostsArg}
+	err = rootCmd.Execute()
+	require.NoError(err)
+
+	value, stat, err := zkConn.Get(testPath)
+	require.NoError(err)
+	assert.NotNil(stat)
+	assert.Equal([]byte(testData), value)
+
+	tempOutput := os.Stdout
+	r, w, err := os.Pipe()
+	require.Nil(err)
+	os.Stdout = w
+	defer func() {
+		os.Stdout = tempOutput
+	}()
+	os.Args = []string{zkcliCommandUse, getCommandUse, testPath, "--" + serverFlag, hostsArg}
+	err = rootCmd.Execute()
+	require.NoError(err)
+	reader := bufio.NewReader(r)
+	output, _ := reader.ReadString('\n')
+	require.NoError(err)
+	assert.Equal(testData + "\n", output)
+
+	os.Args = []string{zkcliCommandUse, getCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + omitNewlineFlag}
+	err = rootCmd.Execute()
+	require.NoError(err)
+	os.Stdout = tempOutput
+	outputBytes := make([]byte, 100)
+	bytesRead, err := reader.Read(outputBytes)
+	require.Equal(len(testData), bytesRead)
+	require.NoError(err)
+	assert.Equal(testData, string(outputBytes[:bytesRead]))
+
+	const (
+		updatedTestData = "newVal"
+	)
+
+	os.Args = []string{zkcliCommandUse, setCommandUse, testPath, updatedTestData, "--" + serverFlag, hostsArg}
+	err = rootCmd.Execute()
+	require.NoError(err)
+
+	value, stat, err = zkConn.Get(testPath)
+	require.NoError(err)
+	assert.NotNil(stat)
+	assert.Equal([]byte(updatedTestData), value)
+
+	os.Args = []string{zkcliCommandUse, setCommandUse, testPath, "", "--" + serverFlag, hostsArg}
+	err = rootCmd.Execute()
+	require.NoError(err)
+
+	value, stat, err = zkConn.Get(testPath)
+	require.NoError(err)
+	assert.NotNil(stat)
+	assert.Equal([]byte{}, value)
+
+	os.Args = []string{zkcliCommandUse, deleterCommandUse, baseTestPath, "", "--" + serverFlag, hostsArg}
+	err = rootCmd.Execute()
+	require.NoError(err)
+
+	exists, stat, err := zkConn.Exists(baseTestPath)
+	require.NoError(err)
+	assert.NotNil(stat)
+	assert.False(exists)
+}
+
+func TestCreate(t *testing.T) {
+	require := r.New(t)
+	//assert := a.New(t)
+
+	hosts, id, err := StartServer()
+	require.NoError(err)
+	defer id.KillRemove()
+	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
+	defer zkConn.Close()
+
+	client = zk.NewZooKeeper()
+	client.SetServers(hosts)
+
+	const (
+		testPath = "/test"
+		//testData = "data"
+	)
+
+	os.Args = []string{zkcliCommandUse, createCommandUse, testPath}
+	err = rootCmd.Execute()
+	require.Error(err)
+
+	os.Args = []string{zkcliCommandUse, createCommandUse, "invalidPath"}
+	err = rootCmd.Execute()
+	require.Error(err)
 }
