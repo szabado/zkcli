@@ -23,6 +23,8 @@ const (
 
 	serverFlag = "servers"
 	omitNewlineFlag = "n"
+	verboseFlag = "verbose"
+	debugFlag = "debug"
 )
 
 var (
@@ -48,8 +50,8 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&force, "force", false, "force operation")
 	rootCmd.PersistentFlags().StringVar(&format, "format", txtFormat, "output format ("+txtFormat+"|"+jsonFormat+")")
 	rootCmd.PersistentFlags().BoolVar(&omitNewline, omitNewlineFlag, false, "omit trailing newline")
-	rootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "verbose")
-	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "debug mode (very verbose)")
+	rootCmd.PersistentFlags().BoolVar(&verbose, verboseFlag, false, "verbose")
+	rootCmd.PersistentFlags().BoolVar(&debug, debugFlag, false, "debug mode (very verbose)")
 	rootCmd.PersistentFlags().StringVar(&authUser, "auth_usr", "", "optional, digest scheme, user")
 	rootCmd.PersistentFlags().StringVar(&authPwd, "auth_pwd", "", "optional, digest scheme, pwd")
 
@@ -82,8 +84,13 @@ var rootCmd = &cobra.Command{
 
 		serversArray := strings.Split(servers, ",")
 		if len(serversArray) == 0 || serversArray[0] == "" {
-			log.Fatal("Expected comma delimited list of servers via --servers")
+			return errors.Errorf("Expected comma delimited list of servers via --servers")
 		}
+
+		if len(args) == 0 {
+			return errors.Errorf("Path must be specified")
+		}
+		path = args[0]
 
 		if strings.HasSuffix(path, "/") {
 			log.Warn("Removing trailing / from path")
@@ -98,11 +105,6 @@ var rootCmd = &cobra.Command{
 			authExp := fmt.Sprintf("%v:%v", authUser, authPwd)
 			client.SetAuth("digest", []byte(authExp))
 		}
-
-		if len(args) == 0 {
-			return errors.Errorf("Path must be specified")
-		}
-		path = args[0]
 
 		return nil
 	},

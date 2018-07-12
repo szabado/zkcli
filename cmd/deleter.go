@@ -1,9 +1,8 @@
 package cmd
 
 import (
-	"log"
-
 	"github.com/spf13/cobra"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -24,7 +23,8 @@ var deleterCmd = &cobra.Command{
 
 func deleterExecute(cmd *cobra.Command, _ []string) error {
 	if !force {
-		log.Fatal(cmd.Use + " command requires --force for safety measure")
+		force = true
+		log.Warn("%v command requires --force for safety measure", cmd.Use)
 	}
 
 	return client.DeleteRecursive(path, concurrentRequests)
