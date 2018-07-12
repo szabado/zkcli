@@ -6,12 +6,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	existsCommandUse = "exists"
+)
+
 func init() {
 	rootCmd.AddCommand(existsCmd)
 }
 
 var existsCmd = &cobra.Command{
-	Use:  "exists",
+	Use:  existsCommandUse,
 	RunE: existsExecute,
 }
 

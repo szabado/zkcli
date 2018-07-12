@@ -85,8 +85,6 @@ var rootCmd = &cobra.Command{
 			log.Fatal("Expected comma delimited list of servers via --servers")
 		}
 
-		// TODO: Add positional path argument
-
 		if strings.HasSuffix(path, "/") {
 			log.Warn("Removing trailing / from path")
 			path = strings.TrimSuffix(path, "/")

@@ -27,7 +27,6 @@ var createCmd = &cobra.Command{
 }
 
 func createExecute(_ *cobra.Command, args []string) error {
-	// TODO: Fix this
 	if len(args) < 2 {
 		return errors.Errorf("expected data argument")
 	} else if len(args) >= 3 {

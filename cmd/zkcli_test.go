@@ -114,7 +114,7 @@ func TestCRUD(t *testing.T) {
 	assert.NotNil(stat)
 	assert.Equal([]byte{}, value)
 
-	os.Args = []string{zkcliCommandUse, deleteCommandUse, testPath, "", "--" + serverFlag, hostsArg}
+	os.Args = []string{zkcliCommandUse, deleteCommandUse, testPath, "--" + serverFlag, hostsArg}
 	err = rootCmd.Execute()
 	require.NoError(err)
 
@@ -122,6 +122,10 @@ func TestCRUD(t *testing.T) {
 	require.NoError(err)
 	assert.NotNil(stat)
 	assert.False(exists)
+
+	os.Args = []string{zkcliCommandUse, existsCommandUse, testPath, "--" + serverFlag, hostsArg}
+	err = rootCmd.Execute()
+	require.NoError(err)
 }
 
 func TestCRUDRecurisve(t *testing.T) {
@@ -199,7 +203,7 @@ func TestCRUDRecurisve(t *testing.T) {
 	assert.NotNil(stat)
 	assert.Equal([]byte{}, value)
 
-	os.Args = []string{zkcliCommandUse, deleterCommandUse, baseTestPath, "", "--" + serverFlag, hostsArg}
+	os.Args = []string{zkcliCommandUse, deleterCommandUse, baseTestPath, "--" + serverFlag, hostsArg}
 	err = rootCmd.Execute()
 	require.NoError(err)
 
@@ -207,6 +211,10 @@ func TestCRUDRecurisve(t *testing.T) {
 	require.NoError(err)
 	assert.NotNil(stat)
 	assert.False(exists)
+
+	os.Args = []string{zkcliCommandUse, existsCommandUse, baseTestPath, "--" + serverFlag, hostsArg}
+	err = rootCmd.Execute()
+	require.NoError(err)
 }
 
 func TestCreate(t *testing.T) {
@@ -231,7 +239,7 @@ func TestCreate(t *testing.T) {
 	err = rootCmd.Execute()
 	require.Error(err)
 
-	os.Args = []string{zkcliCommandUse, createCommandUse, "invalidPath"}
+	os.Args = []string{zkcliCommandUse, createCommandUse, "/../invalidPath"}
 	err = rootCmd.Execute()
 	require.Error(err)
 }
