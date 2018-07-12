@@ -1,9 +1,9 @@
+language: go
+
 sudo: required
 
 services:
   - docker
-
-language: go
 
 go:
   - 1.8.x
