@@ -22,6 +22,7 @@ func init() {
 
 var createCmd = &cobra.Command{
 	Use: createCommandUse,
+	Short: "Create the specified znode",
 	// Don't have preruns here, creater calls createExecute and does no setup
 	RunE: createExecute,
 }

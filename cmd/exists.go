@@ -16,6 +16,7 @@ func init() {
 
 var existsCmd = &cobra.Command{
 	Use:  existsCommandUse,
+	Short: "Check if the specified znode exists",
 	RunE: existsExecute,
 }
 

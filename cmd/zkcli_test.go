@@ -49,12 +49,12 @@ func TestCRUD(t *testing.T) {
 	defer id.KillRemove()
 	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
 	defer zkConn.Close()
+	hostsArg := strings.Join(hosts, ",")
 
 	const (
 		testPath = "/test"
 		testData = "data"
 	)
-	hostsArg := strings.Join(hosts, ",")
 
 	os.Args = []string{zkcliCommandUse, createCommandUse, testPath, testData, "--" + serverFlag, hostsArg}
 	err = rootCmd.Execute()
@@ -137,13 +137,13 @@ func TestCRUDRecurisve(t *testing.T) {
 	defer id.KillRemove()
 	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
 	defer zkConn.Close()
+	hostsArg := strings.Join(hosts, ",")
 
 	const (
 		baseTestPath = "/test"
 		testPath = baseTestPath + "/example/debugging?"
 		testData = "data"
 	)
-	hostsArg := strings.Join(hosts, ",")
 
 	os.Args = []string{zkcliCommandUse, createrCommandUse, testPath, testData, "--" + serverFlag, hostsArg}
 	err = rootCmd.Execute()
@@ -219,13 +219,14 @@ func TestCRUDRecurisve(t *testing.T) {
 
 func TestCreate(t *testing.T) {
 	require := r.New(t)
-	//assert := a.New(t)
+	assert := a.New(t)
 
 	hosts, id, err := StartServer()
 	require.NoError(err)
 	defer id.KillRemove()
 	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
 	defer zkConn.Close()
+	hostsArg := strings.Join(hosts, ",")
 
 	client = zk.NewZooKeeper()
 	client.SetServers(hosts)
@@ -235,11 +236,38 @@ func TestCreate(t *testing.T) {
 		//testData = "data"
 	)
 
-	os.Args = []string{zkcliCommandUse, createCommandUse, testPath}
+	os.Args = []string{zkcliCommandUse, createCommandUse, testPath, "--" + serverFlag, hostsArg}
 	err = rootCmd.Execute()
 	require.Error(err)
 
-	os.Args = []string{zkcliCommandUse, createCommandUse, "/../invalidPath"}
+	os.Args = []string{zkcliCommandUse, createCommandUse, "/../invalidPath", "--" + serverFlag, hostsArg}
+	err = rootCmd.Execute()
+	require.Error(err)
+
+	exists, stat, err := zkConn.Exists("/invalidPath")
+	require.Nil(err)
+	assert.NotNil(stat)
+	assert.False(exists)
+}
+
+func TestSet(t *testing.T) {
+	require := r.New(t)
+
+	hosts, id, err := StartServer()
+	require.NoError(err)
+	defer id.KillRemove()
+	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
+	defer zkConn.Close()
+	hostsArg := strings.Join(hosts, ",")
+
+	client = zk.NewZooKeeper()
+	client.SetServers(hosts)
+
+	os.Args = []string{zkcliCommandUse, setCommandUse, "--" + serverFlag, hostsArg}
+	err = rootCmd.Execute()
+	require.Error(err)
+
+	os.Args = []string{zkcliCommandUse, setCommandUse, "/../invalidPath", "--" + serverFlag, hostsArg}
 	err = rootCmd.Execute()
 	require.Error(err)
 }

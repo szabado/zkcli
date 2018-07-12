@@ -12,18 +12,13 @@ const (
 
 func init() {
 	rootCmd.AddCommand(deleterCmd)
-	rootCmd.AddCommand(rmrCmd)
 	deleterCmd.PersistentFlags().IntVar(&concurrentRequests, "concurrent_requests", 1, "Number of requests to make in parallel")
-	rmrCmd.PersistentFlags().IntVar(&concurrentRequests, "concurrent_requests", 1, "Number of requests to make in parallel")
 }
 
 var deleterCmd = &cobra.Command{
 	Use:  deleterCommandUse,
-	RunE: deleterExecute,
-}
-
-var rmrCmd = &cobra.Command{
-	Use:  "rmr",
+	Short: "Delete the specified znode, as well as any children",
+	Aliases: []string{"rmr"},
 	RunE: deleterExecute,
 }
 

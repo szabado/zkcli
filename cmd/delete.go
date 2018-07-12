@@ -10,16 +10,12 @@ const (
 
 func init() {
 	rootCmd.AddCommand(deleteCmd)
-	rootCmd.AddCommand(rmCmd)
 }
 
 var deleteCmd = &cobra.Command{
 	Use:  deleteCommandUse,
-	RunE: deleteExecute,
-}
-
-var rmCmd = &cobra.Command{
-	Use:  "rm",
+	Short: "Delete the specified znode",
+	Aliases:[]string{"rm"},
 	RunE: deleteExecute,
 }
 

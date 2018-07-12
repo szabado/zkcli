@@ -10,6 +10,7 @@ func init() {
 
 var getACLCmd = &cobra.Command{
 	Use:  "getacl",
+	Short: "Get the ACL associated with a znode",
 	RunE: getACLExecute,
 }
 

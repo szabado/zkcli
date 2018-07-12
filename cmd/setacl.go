@@ -14,6 +14,7 @@ func init() {
 
 var setACLCmd = &cobra.Command{
 	Use: "setacl",
+	Short: "Set the ACL of the specified znode",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) > 2 {
 			aclstr = args[1]

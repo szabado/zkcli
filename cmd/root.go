@@ -81,7 +81,7 @@ var rootCmd = &cobra.Command{
 		log.Info("starting")
 
 		serversArray := strings.Split(servers, ",")
-		if len(serversArray) == 0 {
+		if len(serversArray) == 0 || serversArray[0] == "" {
 			log.Fatal("Expected comma delimited list of servers via --servers")
 		}
 
@@ -99,6 +99,9 @@ var rootCmd = &cobra.Command{
 			client.SetAuth("digest", []byte(authExp))
 		}
 
+		if len(args) == 0 {
+			return errors.Errorf("Path must be specified")
+		}
 		path = args[0]
 
 		return nil
