@@ -42,7 +42,12 @@ func (p TxtPrinter) PrintString(data []byte) {
 }
 
 func (p TxtPrinter) PrintStringArray(stringArray []string) {
-	fmt.Println(strings.Join(stringArray, "\n"))
+	s := fmt.Sprintf("%s", strings.Join(stringArray, "\n"))
+	if p.OmitTrailingNL {
+		fmt.Print(s)
+	} else {
+		fmt.Println(s)
+	}
 }
 
 type JSONPrinter struct{}

@@ -21,8 +21,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/outbrain/golib/log"
-	"github.com/samuel/go-zookeeper/zk"
 	"math"
 	gopath "path"
 	"sort"
@@ -30,6 +28,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/samuel/go-zookeeper/zk"
+	log "github.com/sirupsen/logrus"
 )
 
 type ZooKeeper struct {
@@ -165,6 +166,8 @@ func (zook *ZooKeeper) Children(path string) ([]string, error) {
 	defer connection.Close()
 
 	children, _, err := connection.Children(path)
+	sort.Strings(children)
+
 	return children, err
 }
 
@@ -445,13 +448,13 @@ func (zook *ZooKeeper) Delete(path string) error {
 func (zook *ZooKeeper) DeleteRecursive(path string, concurrentRequests int) error {
 	result, err := zook.ChildrenRecursive(path, concurrentRequests)
 	if err != nil {
-		log.Fatale(err)
+		log.Fatal(err)
 	}
 
 	for i := len(result) - 1; i >= 0; i-- {
 		znode := path + "/" + result[i]
 		if err = zook.Delete(znode); err != nil {
-			log.Fatale(err)
+			log.Fatal(err)
 		}
 	}
 
