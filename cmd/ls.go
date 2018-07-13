@@ -20,7 +20,7 @@ func lsExecute(_ *cobra.Command, _ []string) error {
 		return err
 	}
 
-	out.PrintStringArray(children)
+	out.PrintArray(children)
 
 	return nil
 }

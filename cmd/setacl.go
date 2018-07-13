@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"os"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -37,7 +36,7 @@ func setACLExecute(_ *cobra.Command, _ []string) error {
 		return err
 	}
 
-	log.Infof("Set %+v", result)
+	out.Printf("Set %+v", result)
 
 	return nil
 }

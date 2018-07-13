@@ -20,7 +20,7 @@ func getACLExecute(_ *cobra.Command, _ []string) error {
 		return err
 	}
 
-	out.PrintStringArray(value)
+	out.PrintArray(value)
 
 	return nil
 }

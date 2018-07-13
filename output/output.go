@@ -20,44 +20,55 @@ package output
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 )
 
+var out *os.File
+
+func init() {
+	out = os.Stdout
+}
+
 type Printer interface {
-	PrintString(data []byte)
-	PrintStringArray(array []string)
+	Printf(format string, a ...interface{})
+	PrintArray(array []string)
 }
 
 type TxtPrinter struct {
 	OmitTrailingNL bool
 }
 
-func (p TxtPrinter) PrintString(data []byte) {
-	s := fmt.Sprintf("%s", data)
+func (p TxtPrinter) Print(data string) {
 	if p.OmitTrailingNL {
-		fmt.Print(s)
+		fmt.Fprint(out, data)
 	} else {
-		fmt.Println(s)
+		fmt.Fprintln(out, data)
 	}
 }
 
-func (p TxtPrinter) PrintStringArray(stringArray []string) {
-	s := fmt.Sprintf("%s", strings.Join(stringArray, "\n"))
+func (p TxtPrinter) Printf(format string, a ... interface{}) {
+	fmt.Fprintf(out, format, a...)
+}
+
+func (p TxtPrinter) PrintArray(stringArray []string) {
+	s := strings.Join(stringArray, "\n")
 	if p.OmitTrailingNL {
-		fmt.Print(s)
+		fmt.Fprint(out, s)
 	} else {
-		fmt.Println(s)
+		fmt.Fprintln(out, s)
 	}
 }
 
 type JSONPrinter struct{}
 
-func (_ JSONPrinter) PrintString(data []byte) {
-	s, _ := json.Marshal(string(data))
-	fmt.Println(string(s))
+func (p JSONPrinter) Printf(format string, a ... interface{}) {
+	s := fmt.Sprintf(format, a...)
+	b, _ := json.Marshal(s)
+	fmt.Fprintln(out, string(b))
 }
 
-func (_ JSONPrinter) PrintStringArray(stringArray []string) {
+func (_ JSONPrinter) PrintArray(stringArray []string) {
 	s, _ := json.Marshal(stringArray)
-	fmt.Println(string(s))
+	fmt.Fprintln(out, string(s))
 }

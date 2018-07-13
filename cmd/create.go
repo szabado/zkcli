@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -53,14 +52,14 @@ func createExecute(_ *cobra.Command, args []string) error {
 			return err
 		}
 
-		log.Infof("Created %+v", result)
+		out.Printf("Created %+v", result)
 	} else {
 		result, err := client.Create(path, []byte(data), aclstr, force)
 		if err != nil {
 			return err
 		}
 
-		log.Infof("Created %+v", result)
+		out.Printf("Created %+v", result)
 	}
 
 	return nil

@@ -23,7 +23,7 @@ func getExecute(_ *cobra.Command, _ []string) error {
 		return err
 	}
 
-	out.PrintString(value)
+	out.Printf("%s", value)
 
 	return nil
 }

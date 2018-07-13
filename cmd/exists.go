@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 )
 
@@ -26,7 +24,7 @@ func existsExecute(_ *cobra.Command, _ []string) error {
 		return err
 	}
 
-	fmt.Println(exists)
+	out.Printf("%v", exists)
 
 	return nil
 }
