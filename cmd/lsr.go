@@ -6,7 +6,7 @@ import (
 
 func init() {
 	rootCmd.AddCommand(lsrCmd)
-	lsrCmd.PersistentFlags().IntVar(&concurrentRequests, "concurrent_requests", 1, "Number of requests to make in parallel")
+	lsrCmd.PersistentFlags().IntVar(&concurrentRequests, concurrentRequestsFlag, defaultConcurrentRequests, "Number of requests to make in parallel")
 }
 
 var lsrCmd = &cobra.Command{

@@ -25,12 +25,27 @@ const (
 	omitNewlineFlag = "n"
 	verboseFlag = "verbose"
 	debugFlag = "debug"
+	concurrentRequestsFlag = "concurrent_requests"
+	formatFlag = "format"
+	forceFlag = "force"
+	authUserFlag = "auth_usr"
+	authPwdFlag = "auth_pwd"
+
+	defaultConcurrentRequests = 1
+	defaultFormat             = txtFormat
+	defaultAuthUser           = ""
+	defaultAuthPwd            = ""
+	defaultDebug              = false
+	defaultVerbose            = false
+	defaultOmitnewline        = false
+	defaultPath = ""
+	defaultForce = false
+	defaultServer = ""
 )
 
 var (
 	// Flag variables
 	servers            string
-	command            string
 	force              bool
 	format             string
 	omitNewline        bool
@@ -46,14 +61,14 @@ var (
 )
 
 func init() {
-	rootCmd.PersistentFlags().StringVar(&servers, serverFlag, "", "srv1[:port1][,srv2[:port2]...]")
-	rootCmd.PersistentFlags().BoolVar(&force, "force", false, "force operation")
-	rootCmd.PersistentFlags().StringVar(&format, "format", txtFormat, "output format ("+txtFormat+"|"+jsonFormat+")")
-	rootCmd.PersistentFlags().BoolVar(&omitNewline, omitNewlineFlag, false, "omit trailing newline")
-	rootCmd.PersistentFlags().BoolVar(&verbose, verboseFlag, false, "verbose")
-	rootCmd.PersistentFlags().BoolVar(&debug, debugFlag, false, "debug mode (very verbose)")
-	rootCmd.PersistentFlags().StringVar(&authUser, "auth_usr", "", "optional, digest scheme, user")
-	rootCmd.PersistentFlags().StringVar(&authPwd, "auth_pwd", "", "optional, digest scheme, pwd")
+	rootCmd.PersistentFlags().StringVar(&servers, serverFlag, defaultServer, "srv1[:port1][,srv2[:port2]...]")
+	rootCmd.PersistentFlags().BoolVar(&force, forceFlag, defaultForce, "force operation")
+	rootCmd.PersistentFlags().StringVar(&format, formatFlag, defaultFormat, "output format ("+txtFormat+"|"+jsonFormat+")")
+	rootCmd.PersistentFlags().BoolVar(&omitNewline, omitNewlineFlag, defaultOmitnewline, "omit trailing newline")
+	rootCmd.PersistentFlags().BoolVar(&verbose, verboseFlag, defaultVerbose, "verbose")
+	rootCmd.PersistentFlags().BoolVar(&debug, debugFlag, defaultDebug, "debug mode (very verbose)")
+	rootCmd.PersistentFlags().StringVar(&authUser, authUserFlag, defaultAuthUser, "optional, digest scheme, user")
+	rootCmd.PersistentFlags().StringVar(&authPwd, authPwdFlag, defaultAuthPwd, "optional, digest scheme, pwd")
 
 }
 

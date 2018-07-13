@@ -11,7 +11,7 @@ const (
 
 func init() {
 	rootCmd.AddCommand(deleterCmd)
-	deleterCmd.PersistentFlags().IntVar(&concurrentRequests, "concurrent_requests", 1, "Number of requests to make in parallel")
+	deleterCmd.PersistentFlags().IntVar(&concurrentRequests, concurrentRequestsFlag, defaultConcurrentRequests, "Number of requests to make in parallel")
 }
 
 var deleterCmd = &cobra.Command{

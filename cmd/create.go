@@ -8,6 +8,10 @@ import (
 
 const (
 	createCommandUse = "create"
+
+	aclsFlag = "acls"
+	defaultAclstr = ""
+	defaultAcls = "31"
 )
 
 var (
@@ -17,7 +21,7 @@ var (
 
 func init() {
 	rootCmd.AddCommand(createCmd)
-	createCmd.PersistentFlags().StringVar(&acls, "acls", "31", "optional, csv list [1|,2|,4|,8|,16|,31]")
+	createCmd.PersistentFlags().StringVar(&acls, aclsFlag, defaultAcls, "optional, csv list [1|,2|,4|,8|,16|,31]")
 }
 
 var createCmd = &cobra.Command{

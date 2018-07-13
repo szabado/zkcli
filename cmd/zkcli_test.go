@@ -25,6 +25,24 @@ func (l *logger) Printf(message string, values ...interface{}) {
 	logrus.StandardLogger().Infof(message, values)
 }
 
+func loadDefaultValues() {
+	aclstr = defaultAclstr
+	acls = defaultAcls
+	servers = defaultServer
+	force = defaultForce
+	format = defaultFormat
+	omitNewline = defaultOmitnewline
+	verbose = defaultVerbose
+	debug = defaultDebug
+	authUser = defaultAuthUser
+	authPwd = defaultAuthPwd
+	concurrentRequests = defaultConcurrentRequests
+	path = defaultPath
+
+	client = nil
+	out = nil
+}
+
 func StartServer() (hosts []string, id dockertest.ContainerID, err error) {
 	id, err = dockertest.ConnectToZooKeeper(10, ServerPollingInterval, func(url string) bool {
 		hosts = []string{url}
@@ -56,6 +74,7 @@ func TestCRUD(t *testing.T) {
 		testData = "data"
 	)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{createCommandUse, testPath, testData, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -74,6 +93,8 @@ func TestCRUD(t *testing.T) {
 	defer func() {
 		os.Stdout = tempOutput
 	}()
+
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -96,6 +117,7 @@ func TestCRUD(t *testing.T) {
 		updatedTestData = "newVal"
 	)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{setCommandUse, testPath, updatedTestData, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -105,6 +127,7 @@ func TestCRUD(t *testing.T) {
 	assert.NotNil(stat)
 	assert.Equal([]byte(updatedTestData), value)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{setCommandUse, testPath, "", "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -114,6 +137,7 @@ func TestCRUD(t *testing.T) {
 	assert.NotNil(stat)
 	assert.Equal([]byte{}, value)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{deleteCommandUse, testPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -123,6 +147,7 @@ func TestCRUD(t *testing.T) {
 	assert.NotNil(stat)
 	assert.False(exists)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{existsCommandUse, testPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -145,6 +170,7 @@ func TestCRUDRecurisve(t *testing.T) {
 		testData = "data"
 	)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{createrCommandUse, testPath, testData, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -163,6 +189,8 @@ func TestCRUDRecurisve(t *testing.T) {
 	defer func() {
 		os.Stdout = tempOutput
 	}()
+
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -185,6 +213,7 @@ func TestCRUDRecurisve(t *testing.T) {
 		updatedTestData = "newVal"
 	)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{setCommandUse, testPath, updatedTestData, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -194,6 +223,7 @@ func TestCRUDRecurisve(t *testing.T) {
 	assert.NotNil(stat)
 	assert.Equal([]byte(updatedTestData), value)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{setCommandUse, testPath, "", "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -203,6 +233,7 @@ func TestCRUDRecurisve(t *testing.T) {
 	assert.NotNil(stat)
 	assert.Equal([]byte{}, value)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{deleterCommandUse, baseTestPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -212,6 +243,7 @@ func TestCRUDRecurisve(t *testing.T) {
 	assert.NotNil(stat)
 	assert.False(exists)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{existsCommandUse, baseTestPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -236,10 +268,12 @@ func TestCreate(t *testing.T) {
 		//testData = "data"
 	)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{createCommandUse, testPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.Error(err)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{createCommandUse, "/../invalidPath", "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.Error(err)
@@ -263,10 +297,12 @@ func TestSet(t *testing.T) {
 	client = zk.NewZooKeeper()
 	client.SetServers(hosts)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{setCommandUse, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.Error(err)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{setCommandUse, "/../invalidPath", "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.Error(err)
@@ -287,6 +323,7 @@ func TestRoot(t *testing.T) {
 	rootCmd.SilenceUsage = true
 
 	// No server specified
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{createCommandUse, "/path", "data"})
 	err = rootCmd.Execute()
 	require.Error(err)
@@ -297,6 +334,7 @@ func TestRoot(t *testing.T) {
 	assert.False(exists)
 
 	// Test verbose flag
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{createCommandUse, "/path", "--" + verboseFlag, "--" + serverFlag, hostsArg, "data"})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -309,6 +347,7 @@ func TestRoot(t *testing.T) {
 	assert.Equal("data", string(value))
 
 	// debug flag and an extra slash at the end of the path
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{createCommandUse, "/path/nested/", "--" + debugFlag, "--" + serverFlag, hostsArg, "even more data!"})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -335,6 +374,7 @@ func TestGet(t *testing.T) {
 	client = zk.NewZooKeeper()
 	client.SetServers(hosts)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{getCommandUse, "/../invalidPath", "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.Error(err)
@@ -353,6 +393,7 @@ func TestExists(t *testing.T) {
 	client = zk.NewZooKeeper()
 	client.SetServers(hosts)
 
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{existsCommandUse, "/../invalidPath", "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.Error(err)
