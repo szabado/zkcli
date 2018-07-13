@@ -1,17 +1,20 @@
 package cmd
 
 import (
-	"github.com/ory/dockertest"
-	"time"
-	"github.com/sirupsen/logrus"
-	"testing"
-	r "github.com/stretchr/testify/require"
-	a "github.com/stretchr/testify/assert"
-	zookeeper "github.com/samuel/go-zookeeper/zk"
-	"github.com/fJancsoSzabo/zkcli/zk"
+	"bufio"
+	"fmt"
 	"os"
 	"strings"
-	"bufio"
+	"testing"
+	"time"
+
+	"github.com/ory/dockertest"
+	zookeeper "github.com/samuel/go-zookeeper/zk"
+	"github.com/sirupsen/logrus"
+	a "github.com/stretchr/testify/assert"
+	r "github.com/stretchr/testify/require"
+
+	"github.com/fJancsoSzabo/zkcli/zk"
 )
 
 const (
@@ -27,7 +30,7 @@ func (l *logger) Printf(message string, values ...interface{}) {
 
 func loadDefaultValues() {
 	aclstr = defaultAclstr
-	acls = defaultAcls
+	acls = fmt.Sprint(defaultAcls)
 	servers = defaultServer
 	force = defaultForce
 	format = defaultFormat
@@ -101,7 +104,7 @@ func TestCRUD(t *testing.T) {
 	reader := bufio.NewReader(r)
 	output, _ := reader.ReadString('\n')
 	require.NoError(err)
-	assert.Equal(testData + "\n", output)
+	assert.Equal(testData+"\n", output)
 
 	//rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + omitNewlineFlag})
 	//err = rootCmd.Execute()
@@ -166,8 +169,8 @@ func TestCRUDRecurisve(t *testing.T) {
 
 	const (
 		baseTestPath = "/test"
-		testPath = baseTestPath + "/example/debugging?"
-		testData = "data"
+		testPath     = baseTestPath + "/example/debugging?"
+		testData     = "data"
 	)
 
 	loadDefaultValues()
@@ -197,7 +200,7 @@ func TestCRUDRecurisve(t *testing.T) {
 	reader := bufio.NewReader(r)
 	output, _ := reader.ReadString('\n')
 	require.NoError(err)
-	assert.Equal(testData + "\n", output)
+	assert.Equal(testData+"\n", output)
 
 	//rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + omitNewlineFlag})
 	//err = rootCmd.Execute()
@@ -265,16 +268,18 @@ func TestCreate(t *testing.T) {
 
 	const (
 		testPath = "/test"
-		//testData = "data"
+		testData = "data"
 	)
 
+	// No data provided
 	loadDefaultValues()
 	rootCmd.SetArgs([]string{createCommandUse, testPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.Error(err)
 
+	// Invalid path
 	loadDefaultValues()
-	rootCmd.SetArgs([]string{createCommandUse, "/../invalidPath", "--" + serverFlag, hostsArg})
+	rootCmd.SetArgs([]string{createCommandUse, "/../invalidPath", testData, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.Error(err)
 

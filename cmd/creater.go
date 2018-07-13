@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -10,7 +12,7 @@ const (
 
 func init() {
 	rootCmd.AddCommand(createrCmd)
-	createrCmd.PersistentFlags().StringVar(&acls, aclsFlag, defaultAcls, "optional, csv list [1|,2|,4|,8|,16|,31]")
+	createrCmd.PersistentFlags().StringVar(&acls, aclsFlag, fmt.Sprint(defaultAcls), fmt.Sprintf("optional, csv list [%v|,%v|,%v|,%v|,%v|,%v]", AclRead, AclWrite, AclCreate, AclDelete, AclAdmin, AclAll))
 }
 
 var createrCmd = &cobra.Command{

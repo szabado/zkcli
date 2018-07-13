@@ -41,6 +41,13 @@ const (
 	defaultPath = ""
 	defaultForce = false
 	defaultServer = ""
+
+	AclRead = 1 << iota
+	AclWrite
+	AclCreate
+	AclDelete
+	AclAdmin
+	AclAll = AclRead | AclWrite | AclCreate | AclDelete | AclAdmin
 )
 
 var (
