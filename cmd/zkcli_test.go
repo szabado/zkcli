@@ -287,6 +287,39 @@ func TestCreate(t *testing.T) {
 	require.Nil(err)
 	assert.NotNil(stat)
 	assert.False(exists)
+
+	// Create with credentials
+	loadDefaultValues()
+	rootCmd.SetArgs([]string{createCommandUse, "/authpath", testData, "--" + serverFlag, hostsArg, "--" + authUserFlag, "testuser", "--" + authPwdFlag, "testpassword"})
+	err = rootCmd.Execute()
+	require.NoError(err)
+
+	exists, stat, err = zkConn.Exists("/authpath")
+	require.NoError(err)
+	assert.NotNil(stat)
+	assert.True(exists)
+
+	value, stat, err := zkConn.Get("/authpath")
+	require.Error(err)
+	assert.Equal(&zookeeper.Stat{}, stat)
+	assert.NotEqual(testData, string(value))
+
+	// Try to create with credentials and an invalid path
+	loadDefaultValues()
+	rootCmd.SetArgs([]string{createCommandUse, "/../invalidPath", testData, "--" + serverFlag, hostsArg, "--" + authUserFlag, "testuser", "--" + authPwdFlag, "testpassword"})
+	err = rootCmd.Execute()
+	require.Error(err)
+
+	// Try to create with credentials and an invalid acl path
+	loadDefaultValues()
+	rootCmd.SetArgs([]string{createCommandUse, "/authpaththesecond", "--" + aclsFlag, "What is your favourite colour?", testData, "--" + serverFlag, hostsArg, "--" + authUserFlag, "testuser", "--" + authPwdFlag, "testpassword"})
+	err = rootCmd.Execute()
+	require.Error(err)
+
+	exists, stat, err = zkConn.Exists("/authpaththesecond")
+	require.NoError(err)
+	assert.NotNil(stat)
+	assert.False(exists)
 }
 
 func TestSet(t *testing.T) {
