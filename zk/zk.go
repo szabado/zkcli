@@ -68,7 +68,8 @@ func (zook *ZooKeeper) SetAuth(scheme string, auth []byte) {
 func (zook *ZooKeeper) BuildACL(authScheme string, user string, pwd string, acls string) (perms []zk.ACL, err error) {
 	aclsList := strings.Split(acls, ",")
 	for _, elem := range aclsList {
-		acl, err := strconv.ParseInt(elem, 10, 32)
+		var acl int64
+		acl, err = strconv.ParseInt(elem, 10, 32)
 		if err != nil {
 			break
 		}
