@@ -24,10 +24,10 @@ import (
 	"strings"
 )
 
-var out *os.File
+var Out *os.File
 
 func init() {
-	out = os.Stdout
+	Out = os.Stdout
 }
 
 type Printer interface {
@@ -41,22 +41,22 @@ type TxtPrinter struct {
 
 func (p TxtPrinter) Print(data string) {
 	if p.OmitTrailingNL {
-		fmt.Fprint(out, data)
+		fmt.Fprint(Out, data)
 	} else {
-		fmt.Fprintln(out, data)
+		fmt.Fprintln(Out, data)
 	}
 }
 
 func (p TxtPrinter) Printf(format string, a ... interface{}) {
-	fmt.Fprintf(out, format, a...)
+	fmt.Fprintf(Out, format, a...)
 }
 
 func (p TxtPrinter) PrintArray(stringArray []string) {
 	s := strings.Join(stringArray, "\n")
 	if p.OmitTrailingNL {
-		fmt.Fprint(out, s)
+		fmt.Fprint(Out, s)
 	} else {
-		fmt.Fprintln(out, s)
+		fmt.Fprintln(Out, s)
 	}
 }
 
@@ -65,10 +65,10 @@ type JSONPrinter struct{}
 func (p JSONPrinter) Printf(format string, a ... interface{}) {
 	s := fmt.Sprintf(format, a...)
 	b, _ := json.Marshal(s)
-	fmt.Fprintln(out, string(b))
+	fmt.Fprintln(Out, string(b))
 }
 
 func (_ JSONPrinter) PrintArray(stringArray []string) {
 	s, _ := json.Marshal(stringArray)
-	fmt.Fprintln(out, string(s))
+	fmt.Fprintln(Out, string(s))
 }
