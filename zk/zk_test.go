@@ -18,8 +18,9 @@
 package zk
 
 import (
-	"github.com/samuel/go-zookeeper/zk"
 	"testing"
+
+	"github.com/samuel/go-zookeeper/zk"
 )
 
 func TestParseACLString(t *testing.T) {

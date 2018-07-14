@@ -1,15 +1,18 @@
-FROM gliderlabs/alpine:3.2
+FROM golang:1.10-alpine AS build
 
-MAINTAINER Ryan Eschinger <ryanesc@gmail.com>
+COPY . /go/src/github.com/fJancsoSzabo/zkcli/
 
-COPY . /go/src/github.com/outbrain/zookeepercli/
+RUN apk add curl git
+RUN curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
-RUN apk add --update go git \
-  && cd /go/src/github.com/outbrain/zookeepercli/ \
-  && export GOPATH=/go \
-  && go get \
-  && go build -o /bin/zookeepercli \
-  && rm -rf /go \
-  && apk del --purge go git
+RUN cd /go/src/github.com/fJancsoSzabo/zkcli \
+  && dep ensure \
+  && go install
 
-ENTRYPOINT ["/bin/zookeepercli"]
+FROM alpine:3.8
+
+RUN mkdir -p /go/bin
+COPY --from=build go/bin/zkcli /go/bin/zkcli
+ENV PATH /go/bin:$PATH
+
+ENTRYPOINT ["/go/bin/zkcli"]
