@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/fJancsoSzabo/zkcli/output"
 	"github.com/fJancsoSzabo/zkcli/zk"
@@ -76,15 +77,24 @@ func init() {
 	stdin = os.Stdin
 	osExit = os.Exit
 
-	rootCmd.PersistentFlags().StringVar(&servers, serverFlag, defaultServer, "srv1[:port1][,srv2[:port2]...]")
+	rootCmd.PersistentFlags().String(serverFlag, defaultServer, "srv1[:port1][,srv2[:port2]...]")
 	rootCmd.PersistentFlags().BoolVar(&force, forceFlag, defaultForce, "force operation")
 	rootCmd.PersistentFlags().StringVar(&format, formatFlag, defaultFormat, "output format ("+txtFormat+"|"+jsonFormat+")")
 	rootCmd.PersistentFlags().BoolVar(&omitNewline, omitNewlineFlag, defaultOmitnewline, "omit trailing newline")
 	rootCmd.PersistentFlags().BoolVar(&verbose, verboseFlag, defaultVerbose, "verbose")
 	rootCmd.PersistentFlags().BoolVar(&debug, debugFlag, defaultDebug, "debug mode (very verbose)")
-	rootCmd.PersistentFlags().StringVar(&authUser, authUserFlag, defaultAuthUser, "optional, digest scheme, user")
-	rootCmd.PersistentFlags().StringVar(&authPwd, authPwdFlag, defaultAuthPwd, "optional, digest scheme, pwd")
+	rootCmd.PersistentFlags().String(authUserFlag, defaultAuthUser, "optional, digest scheme, user")
+	rootCmd.PersistentFlags().String(authPwdFlag, defaultAuthPwd, "optional, digest scheme, pwd")
 
+	viper.BindPFlag(serverFlag, rootCmd.PersistentFlags().Lookup(serverFlag))
+	viper.BindPFlag(authUserFlag, rootCmd.PersistentFlags().Lookup(authUserFlag))
+	viper.BindPFlag(authPwdFlag, rootCmd.PersistentFlags().Lookup(authPwdFlag))
+	viper.BindEnv(serverFlag, "ZKCLI_SERVERS")
+	viper.BindEnv(authUserFlag, "ZKCLI_AUTH_USER")
+	viper.BindEnv(authPwdFlag, "ZKCLI_AUTH_PWD")
+	servers = viper.Get(serverFlag).(string)
+	authUser = viper.Get(authUserFlag).(string)
+	authPwd = viper.Get(authPwdFlag).(string)
 }
 
 var rootCmd = &cobra.Command{
