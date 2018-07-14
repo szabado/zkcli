@@ -45,12 +45,12 @@ const (
 )
 
 const (
-	AclRead = 1 << iota
-	AclWrite
-	AclCreate
-	AclDelete
-	AclAdmin
-	AclAll = AclRead | AclWrite | AclCreate | AclDelete | AclAdmin
+	aclRead = 1 << iota
+	aclWrite
+	aclCreate
+	aclDelete
+	aclAdmin
+	aclAll = aclRead | aclWrite | aclCreate | aclDelete | aclAdmin
 )
 
 var (

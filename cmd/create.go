@@ -13,7 +13,7 @@ const (
 
 	aclsFlag      = "acls"
 	defaultAclstr = ""
-	defaultAcls   = AclAll
+	defaultAcls   = aclAll
 )
 
 var (
@@ -23,7 +23,7 @@ var (
 
 func init() {
 	rootCmd.AddCommand(createCmd)
-	createCmd.PersistentFlags().StringVar(&acls, aclsFlag, fmt.Sprint(defaultAcls), fmt.Sprintf("optional, csv list [%v|,%v|,%v|,%v|,%v|,%v]", AclRead, AclWrite, AclCreate, AclDelete, AclAdmin, AclAll))
+	createCmd.PersistentFlags().StringVar(&acls, aclsFlag, fmt.Sprint(defaultAcls), fmt.Sprintf("optional, csv list [%v|,%v|,%v|,%v|,%v|,%v]", aclRead, aclWrite, aclCreate, aclDelete, aclAdmin, aclAll))
 }
 
 var createCmd = &cobra.Command{
