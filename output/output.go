@@ -40,14 +40,6 @@ type TxtPrinter struct {
 	OmitTrailingNL bool
 }
 
-func (p TxtPrinter) Print(data string) {
-	if p.OmitTrailingNL {
-		fmt.Fprint(Out, data)
-	} else {
-		fmt.Fprintln(Out, data)
-	}
-}
-
 func (p TxtPrinter) Printf(format string, a ...interface{}) {
 	fmt.Fprintf(Out, format, a...)
 	if !p.OmitTrailingNL {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
 
@@ -42,6 +43,10 @@ func createExecute(_ *cobra.Command, args []string) error {
 	data := args[1]
 
 	if authUser != "" && authPwd != "" {
+		if aclstr != "" {
+			log.Warnf("Ignoring acl %v since --%v and --%v were specified", aclstr, authUserFlag, authPwdFlag)
+		}
+
 		perms, err := client.BuildACL("digest", authUser, authPwd, acls)
 		if err != nil {
 			return err
@@ -54,6 +59,10 @@ func createExecute(_ *cobra.Command, args []string) error {
 
 		out.Printf("Created %+v", result)
 	} else {
+		if authUser != "" || authPwd != "" {
+			log.Warnf("Both --%v and --%v must be specified", authUserFlag, authPwdFlag)
+		}
+
 		result, err := client.Create(path, []byte(data), aclstr, force)
 		if err != nil {
 			return err

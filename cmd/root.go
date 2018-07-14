@@ -110,8 +110,6 @@ var rootCmd = &cobra.Command{
 			return errors.Errorf("unknown output type %s", format)
 		}
 
-		log.Info("starting")
-
 		serversArray := strings.Split(servers, ",")
 		if len(serversArray) == 0 || serversArray[0] == "" {
 			return errors.Errorf("Expected comma delimited list of servers via --servers")
