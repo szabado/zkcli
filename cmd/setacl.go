@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"io/ioutil"
-	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -16,14 +15,14 @@ func init() {
 }
 
 var setACLCmd = &cobra.Command{
-	Use: setAclCommandUse,
+	Use:   setAclCommandUse,
 	Short: "Set the ACL of the specified znode",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		if len(args) >= 2 {
 			aclstr = args[1]
 		} else {
 			var err error
-			data, err := ioutil.ReadAll(os.Stdin)
+			data, err := ioutil.ReadAll(stdin)
 			if err != nil {
 				return err
 			}

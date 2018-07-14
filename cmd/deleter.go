@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 const (
@@ -15,10 +15,10 @@ func init() {
 }
 
 var deleterCmd = &cobra.Command{
-	Use:  deleterCommandUse,
-	Short: "Delete the specified znode, as well as any children",
+	Use:     deleterCommandUse,
+	Short:   "Delete the specified znode, as well as any children",
 	Aliases: []string{"rmr"},
-	RunE: deleterExecute,
+	RunE:    deleterExecute,
 }
 
 func deleterExecute(cmd *cobra.Command, _ []string) error {

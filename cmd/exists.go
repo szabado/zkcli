@@ -13,9 +13,9 @@ func init() {
 }
 
 var existsCmd = &cobra.Command{
-	Use:  existsCommandUse,
+	Use:   existsCommandUse,
 	Short: "Check if the specified znode exists",
-	RunE: existsExecute,
+	RunE:  existsExecute,
 }
 
 func existsExecute(_ *cobra.Command, _ []string) error {

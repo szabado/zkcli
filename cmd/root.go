@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"math/rand"
 	"os"
 	"strings"
@@ -21,15 +22,15 @@ const (
 
 	zkcliCommandUse = "zkcli"
 
-	serverFlag = "servers"
-	omitNewlineFlag = "n"
-	verboseFlag = "verbose"
-	debugFlag = "debug"
+	serverFlag             = "servers"
+	omitNewlineFlag        = "n"
+	verboseFlag            = "verbose"
+	debugFlag              = "debug"
 	concurrentRequestsFlag = "concurrent_requests"
-	formatFlag = "format"
-	forceFlag = "force"
-	authUserFlag = "auth_usr"
-	authPwdFlag = "auth_pwd"
+	formatFlag             = "format"
+	forceFlag              = "force"
+	authUserFlag           = "auth_usr"
+	authPwdFlag            = "auth_pwd"
 
 	defaultConcurrentRequests = 1
 	defaultFormat             = txtFormat
@@ -38,10 +39,12 @@ const (
 	defaultDebug              = false
 	defaultVerbose            = false
 	defaultOmitnewline        = false
-	defaultPath = ""
-	defaultForce = false
-	defaultServer = ""
+	defaultPath               = ""
+	defaultForce              = false
+	defaultServer             = ""
+)
 
+const (
 	AclRead = 1 << iota
 	AclWrite
 	AclCreate
@@ -65,9 +68,12 @@ var (
 
 	client *zk.ZooKeeper
 	out    output.Printer
+	stdin  io.Reader
 )
 
 func init() {
+	stdin = os.Stdin
+
 	rootCmd.PersistentFlags().StringVar(&servers, serverFlag, defaultServer, "srv1[:port1][,srv2[:port2]...]")
 	rootCmd.PersistentFlags().BoolVar(&force, forceFlag, defaultForce, "force operation")
 	rootCmd.PersistentFlags().StringVar(&format, formatFlag, defaultFormat, "output format ("+txtFormat+"|"+jsonFormat+")")

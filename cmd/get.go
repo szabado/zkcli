@@ -7,14 +7,15 @@ import (
 const (
 	getCommandUse = "get"
 )
+
 func init() {
 	rootCmd.AddCommand(getCmd)
 }
 
 var getCmd = &cobra.Command{
-	Use:  getCommandUse,
+	Use:   getCommandUse,
 	Short: "Get the value of the specified znode",
-	RunE: getExecute,
+	RunE:  getExecute,
 }
 
 func getExecute(_ *cobra.Command, _ []string) error {

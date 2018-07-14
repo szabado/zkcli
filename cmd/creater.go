@@ -16,9 +16,9 @@ func init() {
 }
 
 var createrCmd = &cobra.Command{
-	Use:  createrCommandUse,
+	Use:   createrCommandUse,
 	Short: "Create the specified znode, as well as any required parents",
-	RunE: createrExecute,
+	RunE:  createrExecute,
 }
 
 func createrExecute(cmd *cobra.Command, args []string) error {

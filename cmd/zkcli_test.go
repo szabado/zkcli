@@ -30,7 +30,7 @@ func (l *logger) Printf(message string, values ...interface{}) {
 	logrus.StandardLogger().Infof(message, values)
 }
 
-func loadDefaultValues() *bytes.Buffer {
+func loadDefaultValues() (stdoutBuf *bytes.Buffer, stdinBuf *bytes.Buffer) {
 	aclstr = defaultAclstr
 	acls = fmt.Sprint(defaultAcls)
 	servers = defaultServer
@@ -46,9 +46,12 @@ func loadDefaultValues() *bytes.Buffer {
 
 	client = nil
 	out = nil
-	buf := new(bytes.Buffer)
-	output.Out = buf
-	return buf
+	stdoutBuf = new(bytes.Buffer)
+	output.Out = stdoutBuf
+
+	stdinBuf = new(bytes.Buffer)
+	stdin = stdinBuf
+	return stdoutBuf, stdinBuf
 }
 
 func StartServer() (hosts []string, id dockertest.ContainerID, err error) {
@@ -92,7 +95,7 @@ func TestCRUD(t *testing.T) {
 	assert.NotNil(stat)
 	assert.Equal([]byte(testData), value)
 
-	output := loadDefaultValues()
+	output, _ := loadDefaultValues()
 	rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -100,7 +103,7 @@ func TestCRUD(t *testing.T) {
 	require.NoError(err)
 	assert.Equal(testData+"\n", val)
 
-	output = loadDefaultValues()
+	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + omitNewlineFlag})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -143,7 +146,7 @@ func TestCRUD(t *testing.T) {
 	assert.NotNil(stat)
 	assert.False(exists)
 
-	output = loadDefaultValues()
+	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{existsCommandUse, testPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -179,7 +182,7 @@ func TestCRUDRecurisve(t *testing.T) {
 	assert.NotNil(stat)
 	assert.Equal([]byte(testData), value)
 
-	output := loadDefaultValues()
+	output, _ := loadDefaultValues()
 	rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -187,7 +190,7 @@ func TestCRUDRecurisve(t *testing.T) {
 	require.NoError(err)
 	assert.Equal(testData+"\n", val)
 
-	output = loadDefaultValues()
+	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + omitNewlineFlag})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -229,7 +232,7 @@ func TestCRUDRecurisve(t *testing.T) {
 	assert.NotNil(stat)
 	assert.False(exists)
 
-	output = loadDefaultValues()
+	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{existsCommandUse, baseTestPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -311,6 +314,7 @@ func TestCreate(t *testing.T) {
 
 func TestSet(t *testing.T) {
 	require := r.New(t)
+	assert := a.New(t)
 
 	hosts, id, err := StartServer()
 	require.NoError(err)
@@ -331,6 +335,21 @@ func TestSet(t *testing.T) {
 	rootCmd.SetArgs([]string{setCommandUse, "/../invalidPath", "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.Error(err)
+
+	rootCmd.SetArgs([]string{createCommandUse, "/path", "default testing value", "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.NoError(err)
+
+	_, in := loadDefaultValues()
+	in.WriteString("data")
+	rootCmd.SetArgs([]string{setCommandUse, "/path", "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.NoError(err)
+
+	value, stat, err := zkConn.Get("/path")
+	require.NoError(err)
+	assert.NotNil(stat)
+	assert.Equal("data", string(value))
 }
 
 func TestRoot(t *testing.T) {
@@ -452,7 +471,7 @@ func TestLs(t *testing.T) {
 	err = rootCmd.Execute()
 	require.NoError(err)
 
-	output := loadDefaultValues()
+	output, _ := loadDefaultValues()
 	rootCmd.SetArgs([]string{lsCommandUse, "/", "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -460,7 +479,7 @@ func TestLs(t *testing.T) {
 	require.NoError(err)
 	require.Equal("p\nxyz\nzookeeper\n", string(val))
 
-	output = loadDefaultValues()
+	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{lsCommandUse, "/p", "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -468,7 +487,7 @@ func TestLs(t *testing.T) {
 	require.NoError(err)
 	require.Equal("a\notoooooooo\n", string(val))
 
-	output = loadDefaultValues()
+	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{lsCommandUse, "/p/a", "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -481,7 +500,7 @@ func TestLs(t *testing.T) {
 	err = rootCmd.Execute()
 	require.Error(err)
 
-	output = loadDefaultValues()
+	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{lsrCommandUse, "/", "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -489,7 +508,7 @@ func TestLs(t *testing.T) {
 	require.NoError(err)
 	require.Equal("p\np/a\np/a/t\np/a/t/h\np/a/t/h/s\np/otoooooooo\nxyz\nzookeeper\nzookeeper/quota\n", string(val))
 
-	output = loadDefaultValues()
+	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{lsrCommandUse, "/p", "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -497,7 +516,7 @@ func TestLs(t *testing.T) {
 	require.NoError(err)
 	require.Equal("a\na/t\na/t/h\na/t/h/s\notoooooooo\n", string(val))
 
-	output = loadDefaultValues()
+	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{lsrCommandUse, "/p/a", "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -528,8 +547,8 @@ func TestAcls(t *testing.T) {
 	const (
 		testPath = "/test"
 		testData = "pigeon"
-		acls1 = "world:anyone:rwa"
-		acls2 = "world:anyone:rwa,digest:someuser:hashedpw:cdrwa"
+		acls1    = "world:anyone:rwa"
+		acls2    = "world:anyone:rwa,digest:someuser:hashedpw:cdrwa"
 	)
 
 	loadDefaultValues()
@@ -542,7 +561,7 @@ func TestAcls(t *testing.T) {
 	assert.NotNil(stat)
 	assert.Equal(testData, string(value))
 
-	output := loadDefaultValues()
+	output, _ := loadDefaultValues()
 	rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + omitNewlineFlag})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -550,15 +569,25 @@ func TestAcls(t *testing.T) {
 	require.NoError(err)
 	assert.Equal(testData, string(val))
 
-	output = loadDefaultValues()
+	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{getAclCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + omitNewlineFlag})
 	err = rootCmd.Execute()
 	require.NoError(err)
 	val, err = ioutil.ReadAll(output)
 	require.NoError(err)
-	assert.Equal(acls1, string(val))
+	assert.Equal(strings.Replace(acls1, ",", "\n", -1), string(val))
 
-	output = loadDefaultValues()
+	loadDefaultValues()
+	rootCmd.SetArgs([]string{getAclCommandUse, "/../invalidPath", "--" + serverFlag, hostsArg, "--" + omitNewlineFlag})
+	err = rootCmd.Execute()
+	require.Error(err)
+
+	loadDefaultValues()
+	rootCmd.SetArgs([]string{setAclCommandUse, "/../invalidPath", acls1, "--" + serverFlag, hostsArg, "--" + omitNewlineFlag})
+	err = rootCmd.Execute()
+	require.Error(err)
+
+	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{setAclCommandUse, testPath, acls2, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
@@ -568,11 +597,25 @@ func TestAcls(t *testing.T) {
 	assert.NotNil(stat)
 	assert.Equal(testData, string(value))
 
-	output = loadDefaultValues()
+	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{getAclCommandUse, testPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
 	val, err = ioutil.ReadAll(output)
 	require.NoError(err)
-	assert.Equal(strings.Replace(acls2 + "\n", ",", "\n", -1), string(val))
+	assert.Equal(strings.Replace(acls2+"\n", ",", "\n", -1), string(val))
+
+	_, input := loadDefaultValues()
+	input.WriteString(acls1)
+	rootCmd.SetArgs([]string{setAclCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + debugFlag})
+	err = rootCmd.Execute()
+	require.NoError(err)
+
+	output, _ = loadDefaultValues()
+	rootCmd.SetArgs([]string{getAclCommandUse, testPath, "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.NoError(err)
+	val, err = ioutil.ReadAll(output)
+	require.NoError(err)
+	assert.Equal(acls1+"\n", string(val))
 }

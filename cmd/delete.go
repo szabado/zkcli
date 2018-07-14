@@ -13,10 +13,10 @@ func init() {
 }
 
 var deleteCmd = &cobra.Command{
-	Use:  deleteCommandUse,
-	Short: "Delete the specified znode",
-	Aliases:[]string{"rm"},
-	RunE: deleteExecute,
+	Use:     deleteCommandUse,
+	Short:   "Delete the specified znode",
+	Aliases: []string{"rm"},
+	RunE:    deleteExecute,
 }
 
 func deleteExecute(_ *cobra.Command, _ []string) error {

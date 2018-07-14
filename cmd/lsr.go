@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const(
+const (
 	lsrCommandUse = "lsr"
 )
 
