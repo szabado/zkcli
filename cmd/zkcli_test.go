@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -55,7 +56,6 @@ func loadDefaultValues() (stdoutBuf *bytes.Buffer, stdinBuf *bytes.Buffer) {
 }
 
 type mockBufError struct {
-
 }
 
 func (b *mockBufError) Read(p []byte) (n int, err error) {
@@ -160,7 +160,7 @@ func TestCRUD(t *testing.T) {
 	require.NoError(err)
 	val, err = output.ReadString('\n')
 	require.NoError(err)
-	require.Equal(fmt.Sprintln(false), val)
+	assert.Equal(fmt.Sprintln(false), val)
 }
 
 func TestCRUDRecurisve(t *testing.T) {
@@ -246,7 +246,7 @@ func TestCRUDRecurisve(t *testing.T) {
 	require.NoError(err)
 	val, err = output.ReadString('\n')
 	require.NoError(err)
-	require.Equal(fmt.Sprintln(false), val)
+	assert.Equal(fmt.Sprintln(false), val)
 
 }
 
@@ -418,6 +418,15 @@ func TestRoot(t *testing.T) {
 	assert.NotNil(stat)
 	assert.Equal("even more data!", string(value))
 
+	// debug flag and an extra slash at the end of the path
+	loadDefaultValues()
+	rootCmd.SetArgs([]string{createCommandUse, "/path/nested/2", "--" + debugFlag, "--" + serverFlag, hostsArg, "most data"})
+	Execute()
+
+	value, stat, err = zkConn.Get("/path/nested/2")
+	require.NoError(err)
+	require.NotNil(stat)
+	assert.Equal("most data", string(value))
 }
 
 func TestGet(t *testing.T) {
@@ -460,6 +469,7 @@ func TestExists(t *testing.T) {
 
 func TestLs(t *testing.T) {
 	require := r.New(t)
+	assert := a.New(t)
 
 	hosts, id, err := StartServer()
 	require.NoError(err)
@@ -492,7 +502,7 @@ func TestLs(t *testing.T) {
 	require.NoError(err)
 	val, err := ioutil.ReadAll(output)
 	require.NoError(err)
-	require.Equal("p\nxyz\nzookeeper\n", string(val))
+	assert.Equal("p\nxyz\nzookeeper\n", string(val))
 
 	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{lsCommandUse, "/p", "--" + serverFlag, hostsArg})
@@ -500,7 +510,7 @@ func TestLs(t *testing.T) {
 	require.NoError(err)
 	val, err = ioutil.ReadAll(output)
 	require.NoError(err)
-	require.Equal("a\notoooooooo\n", string(val))
+	assert.Equal("a\notoooooooo\n", string(val))
 
 	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{lsCommandUse, "/p/a", "--" + serverFlag, hostsArg})
@@ -508,12 +518,14 @@ func TestLs(t *testing.T) {
 	require.NoError(err)
 	val, err = ioutil.ReadAll(output)
 	require.NoError(err)
-	require.Equal("t\n", string(val))
+	assert.Equal("t\n", string(val))
 
 	loadDefaultValues()
 	rootCmd.SetArgs([]string{lsCommandUse, "/../invalidpath/", "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.Error(err)
+
+	const lsrRoot = "p\np/a\np/a/t\np/a/t/h\np/a/t/h/s\np/otoooooooo\nxyz\nzookeeper\nzookeeper/quota"
 
 	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{lsrCommandUse, "/", "--" + serverFlag, hostsArg})
@@ -521,7 +533,7 @@ func TestLs(t *testing.T) {
 	require.NoError(err)
 	val, err = ioutil.ReadAll(output)
 	require.NoError(err)
-	require.Equal("p\np/a\np/a/t\np/a/t/h\np/a/t/h/s\np/otoooooooo\nxyz\nzookeeper\nzookeeper/quota\n", string(val))
+	assert.Equal(lsrRoot+"\n", string(val))
 
 	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{lsrCommandUse, "/p", "--" + serverFlag, hostsArg})
@@ -529,7 +541,7 @@ func TestLs(t *testing.T) {
 	require.NoError(err)
 	val, err = ioutil.ReadAll(output)
 	require.NoError(err)
-	require.Equal("a\na/t\na/t/h\na/t/h/s\notoooooooo\n", string(val))
+	assert.Equal("a\na/t\na/t/h\na/t/h/s\notoooooooo\n", string(val))
 
 	output, _ = loadDefaultValues()
 	rootCmd.SetArgs([]string{lsrCommandUse, "/p/a", "--" + serverFlag, hostsArg})
@@ -537,12 +549,23 @@ func TestLs(t *testing.T) {
 	require.NoError(err)
 	val, err = ioutil.ReadAll(output)
 	require.NoError(err)
-	require.Equal("t\nt/h\nt/h/s\n", string(val))
+	assert.Equal("t\nt/h\nt/h/s\n", string(val))
 
 	loadDefaultValues()
 	rootCmd.SetArgs([]string{lsrCommandUse, "/../invalidpath/", "--" + serverFlag, hostsArg, "--" + debugFlag})
 	err = rootCmd.Execute()
 	require.Error(err)
+
+	output, _ = loadDefaultValues()
+	rootCmd.SetArgs([]string{lsrCommandUse, "/", "--" + serverFlag, hostsArg, "--" + formatFlag, jsonFormat})
+	err = rootCmd.Execute()
+	require.NoError(err)
+	val, err = ioutil.ReadAll(output)
+	require.Nil(err)
+	lsrList := strings.Split(lsrRoot, "\n")
+	marshaled, err := json.Marshal(lsrList)
+	require.Nil(err)
+	assert.Equal(string(marshaled)+"\n", string(val))
 }
 
 func TestAcls(t *testing.T) {
