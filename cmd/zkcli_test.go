@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"strings"
 	"testing"
 	"time"
@@ -12,6 +14,7 @@ import (
 	a "github.com/stretchr/testify/assert"
 	r "github.com/stretchr/testify/require"
 
+	"github.com/fJancsoSzabo/zkcli/output"
 	"github.com/fJancsoSzabo/zkcli/zk"
 )
 
@@ -26,7 +29,7 @@ func (l *logger) Printf(message string, values ...interface{}) {
 	logrus.StandardLogger().Infof(message, values)
 }
 
-func loadDefaultValues() {
+func loadDefaultValues() *bytes.Buffer {
 	aclstr = defaultAclstr
 	acls = fmt.Sprint(defaultAcls)
 	servers = defaultServer
@@ -42,6 +45,9 @@ func loadDefaultValues() {
 
 	client = nil
 	out = nil
+	buf := new(bytes.Buffer)
+	output.Out = buf
+	return buf
 }
 
 func StartServer() (hosts []string, id dockertest.ContainerID, err error) {
@@ -85,34 +91,22 @@ func TestCRUD(t *testing.T) {
 	assert.NotNil(stat)
 	assert.Equal([]byte(testData), value)
 
-	//tempOutput := os.Stdout
-	//r, w, err := os.Pipe()
-	//require.Nil(err)
-	//defer r.Close()
-	//defer w.Close()
-	//os.Stdout = w
-	//defer func() {
-	//	os.Stdout = tempOutput
-	//}()
-
-	loadDefaultValues()
+	output := loadDefaultValues()
 	rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
-	//reader := bufio.NewReader(r)
-	//output, _ := reader.ReadString('\n')
+	val, err := output.ReadString('\n')
 	require.NoError(err)
-	//assert.Equal(testData+"\n", output)
+	assert.Equal(testData+"\n", val)
 
-	//rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + omitNewlineFlag})
-	//err = rootCmd.Execute()
-	//require.NoError(err)
-	//os.Stdout = tempOutput
-	//outputBytes := make([]byte, 100)
-	//bytesRead, err := reader.Read(outputBytes)
-	//require.Equal(len(testData), bytesRead)
-	//require.NoError(err)
-	//assert.Equal(testData, string(outputBytes[:bytesRead]))
+	output = loadDefaultValues()
+	rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + omitNewlineFlag})
+	err = rootCmd.Execute()
+	require.NoError(err)
+
+	val, err = output.ReadString('\n')
+	require.Equal(io.EOF, err)
+	assert.Equal(testData, val)
 
 	const (
 		updatedTestData = "newVal"
@@ -148,10 +142,13 @@ func TestCRUD(t *testing.T) {
 	assert.NotNil(stat)
 	assert.False(exists)
 
-	loadDefaultValues()
+	output = loadDefaultValues()
 	rootCmd.SetArgs([]string{existsCommandUse, testPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
+	val, err = output.ReadString('\n')
+	require.NoError(err)
+	require.Equal(fmt.Sprintln(false), val)
 }
 
 func TestCRUDRecurisve(t *testing.T) {
@@ -181,34 +178,21 @@ func TestCRUDRecurisve(t *testing.T) {
 	assert.NotNil(stat)
 	assert.Equal([]byte(testData), value)
 
-	//tempOutput := os.Stdout
-	//r, w, err := os.Pipe()
-	//require.Nil(err)
-	//defer r.Close()
-	//defer w.Close()
-	//os.Stdout = w
-	//defer func() {
-	//	os.Stdout = tempOutput
-	//}()
-
-	loadDefaultValues()
+	output := loadDefaultValues()
 	rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
-	//reader := bufio.NewReader(r)
-	//output, _ := reader.ReadString('\n')
+	val, err := output.ReadString('\n')
 	require.NoError(err)
-	//assert.Equal(testData+"\n", output)
+	assert.Equal(testData+"\n", val)
 
-	//rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + omitNewlineFlag})
-	//err = rootCmd.Execute()
-	//require.NoError(err)
-	//os.Stdout = tempOutput
-	//outputBytes := make([]byte, 100)
-	//bytesRead, err := reader.Read(outputBytes)
-	//require.Equal(len(testData), bytesRead)
-	//require.NoError(err)
-	//assert.Equal(testData, string(outputBytes[:bytesRead]))
+	output = loadDefaultValues()
+	rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + omitNewlineFlag})
+	err = rootCmd.Execute()
+	require.NoError(err)
+	val, err = output.ReadString('\n')
+	require.Equal(io.EOF, err)
+	assert.Equal(testData, val)
 
 	const (
 		updatedTestData = "newVal"
@@ -244,10 +228,14 @@ func TestCRUDRecurisve(t *testing.T) {
 	assert.NotNil(stat)
 	assert.False(exists)
 
-	loadDefaultValues()
+	output = loadDefaultValues()
 	rootCmd.SetArgs([]string{existsCommandUse, baseTestPath, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)
+	val, err = output.ReadString('\n')
+	require.NoError(err)
+	require.Equal(fmt.Sprintln(false), val)
+
 }
 
 func TestCreate(t *testing.T) {

@@ -20,11 +20,12 @@ package output
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 )
 
-var Out *os.File
+var Out io.Writer
 
 func init() {
 	Out = os.Stdout
@@ -47,8 +48,11 @@ func (p TxtPrinter) Print(data string) {
 	}
 }
 
-func (p TxtPrinter) Printf(format string, a ... interface{}) {
+func (p TxtPrinter) Printf(format string, a ...interface{}) {
 	fmt.Fprintf(Out, format, a...)
+	if !p.OmitTrailingNL {
+		fmt.Fprintln(Out, "")
+	}
 }
 
 func (p TxtPrinter) PrintArray(stringArray []string) {
@@ -62,7 +66,7 @@ func (p TxtPrinter) PrintArray(stringArray []string) {
 
 type JSONPrinter struct{}
 
-func (p JSONPrinter) Printf(format string, a ... interface{}) {
+func (p JSONPrinter) Printf(format string, a ...interface{}) {
 	s := fmt.Sprintf(format, a...)
 	b, _ := json.Marshal(s)
 	fmt.Fprintln(Out, string(b))
