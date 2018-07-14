@@ -7,15 +7,19 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	setAclCommandUse = "setacl"
+)
+
 func init() {
 	rootCmd.AddCommand(setACLCmd)
 }
 
 var setACLCmd = &cobra.Command{
-	Use: "setacl",
+	Use: setAclCommandUse,
 	Short: "Set the ACL of the specified znode",
 	PreRunE: func(cmd *cobra.Command, args []string) error {
-		if len(args) > 2 {
+		if len(args) >= 2 {
 			aclstr = args[1]
 		} else {
 			var err error

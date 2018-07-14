@@ -510,3 +510,69 @@ func TestLs(t *testing.T) {
 	err = rootCmd.Execute()
 	require.Error(err)
 }
+
+func TestAcls(t *testing.T) {
+	require := r.New(t)
+	assert := a.New(t)
+
+	hosts, id, err := StartServer()
+	require.NoError(err)
+	defer id.KillRemove()
+	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
+	defer zkConn.Close()
+	hostsArg := strings.Join(hosts, ",")
+
+	client = zk.NewZooKeeper()
+	client.SetServers(hosts)
+
+	const (
+		testPath = "/test"
+		testData = "pigeon"
+		acls1 = "world:anyone:rwa"
+		acls2 = "world:anyone:rwa,digest:someuser:hashedpw:cdrwa"
+	)
+
+	loadDefaultValues()
+	rootCmd.SetArgs([]string{createCommandUse, testPath, testData, acls1, "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.NoError(err)
+
+	value, stat, err := zkConn.Get("/test")
+	require.NoError(err)
+	assert.NotNil(stat)
+	assert.Equal(testData, string(value))
+
+	output := loadDefaultValues()
+	rootCmd.SetArgs([]string{getCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + omitNewlineFlag})
+	err = rootCmd.Execute()
+	require.NoError(err)
+	val, err := ioutil.ReadAll(output)
+	require.NoError(err)
+	assert.Equal(testData, string(val))
+
+	output = loadDefaultValues()
+	rootCmd.SetArgs([]string{getAclCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + omitNewlineFlag})
+	err = rootCmd.Execute()
+	require.NoError(err)
+	val, err = ioutil.ReadAll(output)
+	require.NoError(err)
+	assert.Equal(acls1, string(val))
+
+	output = loadDefaultValues()
+	rootCmd.SetArgs([]string{setAclCommandUse, testPath, acls2, "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.NoError(err)
+
+	value, stat, err = zkConn.Get(testPath)
+	require.NoError(err)
+	assert.NotNil(stat)
+	assert.Equal(testData, string(value))
+
+	output = loadDefaultValues()
+	rootCmd.SetArgs([]string{getAclCommandUse, testPath, "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.NoError(err)
+	val, err = ioutil.ReadAll(output)
+	require.NoError(err)
+	assert.Equal(strings.Replace(acls2 + "\n", ",", "\n", -1), string(val))
+}

@@ -4,12 +4,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	getAclCommandUse = "getacl"
+)
+
 func init() {
 	rootCmd.AddCommand(getACLCmd)
 }
 
 var getACLCmd = &cobra.Command{
-	Use:  "getacl",
+	Use:  getAclCommandUse,
 	Short: "Get the ACL associated with a znode",
 	RunE: getACLExecute,
 }
