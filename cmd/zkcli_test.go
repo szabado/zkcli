@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"strings"
 	"testing"
 	"time"
@@ -419,6 +420,93 @@ func TestExists(t *testing.T) {
 
 	loadDefaultValues()
 	rootCmd.SetArgs([]string{existsCommandUse, "/../invalidPath", "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.Error(err)
+}
+
+func TestLs(t *testing.T) {
+	require := r.New(t)
+
+	hosts, id, err := StartServer()
+	require.NoError(err)
+	defer id.KillRemove()
+	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
+	defer zkConn.Close()
+	hostsArg := strings.Join(hosts, ",")
+
+	client = zk.NewZooKeeper()
+	client.SetServers(hosts)
+
+	loadDefaultValues()
+	rootCmd.SetArgs([]string{createrCommandUse, "/p/a/t/h/s", "test value one", "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.NoError(err)
+
+	loadDefaultValues()
+	rootCmd.SetArgs([]string{createrCommandUse, "/p/otoooooooo", "--" + serverFlag, hostsArg, "test value two"})
+	err = rootCmd.Execute()
+	require.NoError(err)
+
+	loadDefaultValues()
+	rootCmd.SetArgs([]string{createCommandUse, "/xyz", "test value three", "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.NoError(err)
+
+	output := loadDefaultValues()
+	rootCmd.SetArgs([]string{lsCommandUse, "/", "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.NoError(err)
+	val, err := ioutil.ReadAll(output)
+	require.NoError(err)
+	require.Equal("p\nxyz\nzookeeper\n", string(val))
+
+	output = loadDefaultValues()
+	rootCmd.SetArgs([]string{lsCommandUse, "/p", "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.NoError(err)
+	val, err = ioutil.ReadAll(output)
+	require.NoError(err)
+	require.Equal("a\notoooooooo\n", string(val))
+
+	output = loadDefaultValues()
+	rootCmd.SetArgs([]string{lsCommandUse, "/p/a", "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.NoError(err)
+	val, err = ioutil.ReadAll(output)
+	require.NoError(err)
+	require.Equal("t\n", string(val))
+
+	loadDefaultValues()
+	rootCmd.SetArgs([]string{lsCommandUse, "/../invalidpath/", "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.Error(err)
+
+	output = loadDefaultValues()
+	rootCmd.SetArgs([]string{lsrCommandUse, "/", "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.NoError(err)
+	val, err = ioutil.ReadAll(output)
+	require.NoError(err)
+	require.Equal("p\np/a\np/a/t\np/a/t/h\np/a/t/h/s\np/otoooooooo\nxyz\nzookeeper\nzookeeper/quota\n", string(val))
+
+	output = loadDefaultValues()
+	rootCmd.SetArgs([]string{lsrCommandUse, "/p", "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.NoError(err)
+	val, err = ioutil.ReadAll(output)
+	require.NoError(err)
+	require.Equal("a\na/t\na/t/h\na/t/h/s\notoooooooo\n", string(val))
+
+	output = loadDefaultValues()
+	rootCmd.SetArgs([]string{lsrCommandUse, "/p/a", "--" + serverFlag, hostsArg})
+	err = rootCmd.Execute()
+	require.NoError(err)
+	val, err = ioutil.ReadAll(output)
+	require.NoError(err)
+	require.Equal("t\nt/h\nt/h/s\n", string(val))
+
+	loadDefaultValues()
+	rootCmd.SetArgs([]string{lsrCommandUse, "/../invalidpath/", "--" + serverFlag, hostsArg, "--" + debugFlag})
 	err = rootCmd.Execute()
 	require.Error(err)
 }

@@ -4,15 +4,19 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const(
+	lsrCommandUse = "lsr"
+)
+
 func init() {
 	rootCmd.AddCommand(lsrCmd)
 	lsrCmd.PersistentFlags().IntVar(&concurrentRequests, concurrentRequestsFlag, defaultConcurrentRequests, "Number of requests to make in parallel")
 }
 
 var lsrCmd = &cobra.Command{
-	Use:  "lsr",
+	Use:   lsrCommandUse,
 	Short: "Print the children of the current znode recursively",
-	RunE: lsrExecute,
+	RunE:  lsrExecute,
 }
 
 func lsrExecute(_ *cobra.Command, _ []string) error {

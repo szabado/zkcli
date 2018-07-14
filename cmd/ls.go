@@ -4,14 +4,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	lsCommandUse = "ls"
+)
+
 func init() {
 	rootCmd.AddCommand(lsCmd)
 }
 
 var lsCmd = &cobra.Command{
-	Use:  "ls",
+	Use:   lsCommandUse,
 	Short: "Get the children of the specified znode",
-	RunE: lsExecute,
+	RunE:  lsExecute,
 }
 
 func lsExecute(_ *cobra.Command, _ []string) error {

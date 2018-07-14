@@ -19,7 +19,6 @@ package zk
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"math"
 	gopath "path"
@@ -29,6 +28,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/samuel/go-zookeeper/zk"
 	log "github.com/sirupsen/logrus"
 )
@@ -176,6 +176,7 @@ func (zook *ZooKeeper) Children(path string) ([]string, error) {
 func (zook *ZooKeeper) childrenRecursiveInternal(connection *zk.Conn, path string, concurrentRequests int) ([]string, error) {
 	mu := &sync.Mutex{}
 	wg := sync.WaitGroup{}
+	done := make(chan struct{})
 	jobs := make(chan string)
 	results := make(chan error)
 
@@ -192,6 +193,11 @@ func (zook *ZooKeeper) childrenRecursiveInternal(connection *zk.Conn, path strin
 		jobs <- path
 	}()
 
+	go func() {
+		wg.Wait()
+		close(done)
+	}()
+
 	for i := 0; i < concurrentRequests; i++ {
 		workerID := i + 1
 		log.Debugf("Launched worker %v of %v", workerID, concurrentRequests)
@@ -199,52 +205,56 @@ func (zook *ZooKeeper) childrenRecursiveInternal(connection *zk.Conn, path strin
 			for jobPath := range jobs {
 				log.Debugf("Worker %v received job %v", workerID, jobPath)
 				children, _, err := connection.Children(jobPath)
-				if err != nil {
-					go func() {
-						results <- fmt.Errorf("worker %v encountered an error with path %v: %s", workerID, jobPath, err.Error())
-					}()
+				go func(jobPath string) {
+					if err != nil {
+						log.WithError(err).Debugf("Worker %v encountered an error with path %v", workerID, jobPath)
+						results <- errors.Wrapf(err, "worker %v encountered an error with path %v", workerID, jobPath)
 
+						wg.Done()
+						return
+					}
+
+					for _, child := range children {
+						childPath := gopath.Join(jobPath, child)
+
+						mu.Lock()
+						recursiveChildren = append(recursiveChildren, strings.TrimPrefix(childPath, basePath))
+						mu.Unlock()
+
+						log.Debugf("Incremental child: %+v", childPath)
+
+						// Send the next job
+						wg.Add(1)
+						go func() {
+							jobs <- childPath
+						}()
+					}
 					wg.Done()
-					continue
-				}
-
-				for _, child := range children {
-					childPath := gopath.Join(jobPath, child)
-
-					mu.Lock()
-					recursiveChildren = append(recursiveChildren, strings.TrimPrefix(childPath, basePath))
-					mu.Unlock()
-
-					log.Debugf("Incremental child: %+v", childPath)
-
-					// Send the next job
-					wg.Add(1)
-					go func() {
-						jobs <- childPath
-					}()
-				}
-				wg.Done()
-				log.Debugf("Done processing %s", jobPath)
+					log.Debugf("Done processing %s", jobPath)
+				}(jobPath)
 			}
 		}(connection, jobs, results)
 		log.Debug("Worker exited")
 	}
 
 	log.Debug("All workers started, waiting for them to finish")
-	wg.Wait()
-	log.Debug("All workers finished")
-	close(jobs)
 
-	for {
+	var err error
+	var errCount = 0
+	finished := false
+	for !finished {
 		select {
-		case err := <-results:
-			log.Debug("One of the workers encountered an error: ", err)
-			return nil, err
-		default:
-			log.Debug("No workers encountered errors")
-			return recursiveChildren, nil
+		case err = <-results:
+			errCount++
+			log.WithError(err).Debug("One of the workers encountered an error")
+		case <-done:
+			log.Debug("All workers finished")
+			close(jobs)
+			finished = true
 		}
 	}
+
+	return recursiveChildren, errors.Wrapf(err, "%v errors encountered, the last one being", errCount)
 }
 
 // ChildrenRecursive returns list of all descendants of given path (optionally empty), or error if the path

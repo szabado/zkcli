@@ -114,7 +114,7 @@ var rootCmd = &cobra.Command{
 		}
 		path = args[0]
 
-		if strings.HasSuffix(path, "/") {
+		if strings.HasSuffix(path, "/") && path != "/" {
 			log.Warn("Removing trailing / from path")
 			path = strings.TrimSuffix(path, "/")
 		}
