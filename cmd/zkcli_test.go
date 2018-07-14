@@ -292,7 +292,7 @@ func TestCreate(t *testing.T) {
 
 	// Create with credentials
 	loadDefaultValues()
-	rootCmd.SetArgs([]string{createCommandUse, "/authpath", testData, "--" + serverFlag, hostsArg, "--" + authUserFlag, "testuser", "--" + authPwdFlag, "testpassword"})
+	rootCmd.SetArgs([]string{createCommandUse, "/authpath", testData, "ignoredacl", "--" + serverFlag, hostsArg, "--" + authUserFlag, "testuser", "--" + authPwdFlag, "testpassword"})
 	err = rootCmd.Execute()
 	require.NoError(err)
 
@@ -312,7 +312,7 @@ func TestCreate(t *testing.T) {
 	err = rootCmd.Execute()
 	require.Error(err)
 
-	// Try to create with credentials and an invalid acl path
+	// Try to create with credentials and an invalid acl
 	loadDefaultValues()
 	rootCmd.SetArgs([]string{createCommandUse, "/authpaththesecond", "--" + aclsFlag, "What is your favourite colour?", testData, "--" + serverFlag, hostsArg, "--" + authUserFlag, "testuser", "--" + authPwdFlag, "testpassword"})
 	err = rootCmd.Execute()
@@ -609,7 +609,7 @@ func TestAcls(t *testing.T) {
 	)
 
 	loadDefaultValues()
-	rootCmd.SetArgs([]string{createCommandUse, testPath, testData, acls1, "--" + serverFlag, hostsArg})
+	rootCmd.SetArgs([]string{createCommandUse, testPath, testData, acls1, "--" + serverFlag, hostsArg, "--" + authPwdFlag, "ignoredpassword"})
 	err = rootCmd.Execute()
 	require.NoError(err)
 
