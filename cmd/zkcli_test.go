@@ -54,6 +54,14 @@ func loadDefaultValues() (stdoutBuf *bytes.Buffer, stdinBuf *bytes.Buffer) {
 	return stdoutBuf, stdinBuf
 }
 
+type mockBufError struct {
+
+}
+
+func (b *mockBufError) Read(p []byte) (n int, err error) {
+	panic(bytes.ErrTooLarge)
+}
+
 func StartServer() (hosts []string, id dockertest.ContainerID, err error) {
 	id, err = dockertest.ConnectToZooKeeper(10, ServerPollingInterval, func(url string) bool {
 		hosts = []string{url}
@@ -350,6 +358,13 @@ func TestSet(t *testing.T) {
 	require.NoError(err)
 	assert.NotNil(stat)
 	assert.Equal("data", string(value))
+
+	loadDefaultValues()
+	stdin = &mockBufError{}
+	rootCmd.SetArgs([]string{setAclCommandUse, "/path", "--" + serverFlag, hostsArg, "--" + debugFlag})
+	err = rootCmd.Execute()
+	require.Error(err)
+
 }
 
 func TestRoot(t *testing.T) {
@@ -618,4 +633,10 @@ func TestAcls(t *testing.T) {
 	val, err = ioutil.ReadAll(output)
 	require.NoError(err)
 	assert.Equal(acls1+"\n", string(val))
+
+	loadDefaultValues()
+	stdin = &mockBufError{}
+	rootCmd.SetArgs([]string{setAclCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + debugFlag})
+	err = rootCmd.Execute()
+	require.Error(err)
 }
