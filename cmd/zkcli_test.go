@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -44,6 +45,10 @@ func loadDefaultValues() (stdoutBuf *bytes.Buffer, stdinBuf *bytes.Buffer) {
 	authPwd = defaultAuthPwd
 	concurrentRequests = defaultConcurrentRequests
 	path = defaultPath
+
+	os.Unsetenv(serverEnv)
+	os.Unsetenv(authUserEnv)
+	os.Unsetenv(authPwdEnv)
 
 	osExit = func(code int) {
 		panic("unexpected os.Exit: called with %v")
@@ -690,4 +695,64 @@ func TestAcls(t *testing.T) {
 	rootCmd.SetArgs([]string{setAclCommandUse, testPath, "--" + serverFlag, hostsArg, "--" + debugFlag})
 	err = rootCmd.Execute()
 	require.Error(err)
+}
+
+func TestEnv(t *testing.T) {
+	require := r.New(t)
+	assert := a.New(t)
+
+	hosts, id, err := StartServer()
+	require.NoError(err)
+	defer id.KillRemove()
+	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
+	require.Nil(err)
+	defer zkConn.Close()
+	hostsArg := strings.Join(hosts, ",")
+
+	client = zk.NewZooKeeper()
+	client.SetServers(hosts)
+
+	output, _ := loadDefaultValues()
+	os.Setenv(serverEnv, hostsArg)
+	rootCmd.SetArgs([]string{lsCommandUse, "/", "--" + omitNewlineFlag})
+	err = rootCmd.Execute()
+	require.NoError(err)
+	val, err := ioutil.ReadAll(output)
+	require.Nil(err)
+	assert.Equal("zookeeper", string(val))
+	assert.Equal(hostsArg, servers)
+
+	const (
+		user = "jeff"
+		pwd  = "example"
+	)
+	loadDefaultValues()
+	os.Setenv(serverEnv, hostsArg)
+	os.Setenv(authUserEnv, user)
+	os.Setenv(authPwdEnv, pwd)
+	rootCmd.SetArgs([]string{createCommandUse, "/test", "data"})
+	err = rootCmd.Execute()
+	require.NoError(err)
+	assert.Equal(hostsArg, servers)
+	assert.Equal(user, authUser)
+	assert.Equal(pwd, authPwd)
+
+	value, stat, err := zkConn.Get("/test")
+	require.Error(err)
+	assert.NotNil(stat)
+	assert.NotEqual(value, "data")
+
+	output, _ = loadDefaultValues()
+	os.Setenv(serverEnv, hostsArg)
+	os.Setenv(authUserEnv, user)
+	os.Setenv(authPwdEnv, pwd)
+	rootCmd.SetArgs([]string{getCommandUse, "/test", "--" + omitNewlineFlag})
+	err = rootCmd.Execute()
+	require.NoError(err)
+	val, err = ioutil.ReadAll(output)
+	require.Nil(err)
+	assert.Equal("data", string(val))
+	assert.Equal(hostsArg, servers)
+	assert.Equal(user, authUser)
+	assert.Equal(pwd, authPwd)
 }
