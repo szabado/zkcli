@@ -361,7 +361,7 @@ func TestSet(t *testing.T) {
 
 	loadDefaultValues()
 	stdin = &mockBufError{}
-	rootCmd.SetArgs([]string{setAclCommandUse, "/path", "--" + serverFlag, hostsArg, "--" + debugFlag})
+	rootCmd.SetArgs([]string{setCommandUse, "/path", "--" + serverFlag, hostsArg, "--" + debugFlag})
 	err = rootCmd.Execute()
 	require.Error(err)
 
