@@ -81,7 +81,7 @@ func (zook *ZooKeeper) BuildACL(authScheme string, user string, pwd string, acls
 
 type infoLogger struct{}
 
-func (_ infoLogger) Printf(format string, a ...interface{}) {
+func (infoLogger) Printf(format string, a ...interface{}) {
 	log.Infof(format, a...)
 }
 
@@ -291,11 +291,13 @@ func (zook *ZooKeeper) createInternal(connection *zk.Conn, path string, data []b
 				return returnValue, err
 			}
 			returnValue, err = zook.createInternal(connection, parentPath, []byte("zkcli auto-generated"), acl, force)
+			if err != nil {
+				return returnValue, err
+			}
 		} else {
 			return returnValue, err
 		}
 	}
-	return "", nil
 }
 
 // createInternalWithACL: create a new path with acl
@@ -311,11 +313,13 @@ func (zook *ZooKeeper) createInternalWithACL(connection *zk.Conn, path string, d
 		log.Debugf("create status for %s: %s, %+v", path, returnValue, err)
 		if err != nil && force && attempts < 2 {
 			returnValue, err = zook.createInternalWithACL(connection, gopath.Dir(path), []byte("zkcli auto-generated"), force, perms)
+			if err != nil {
+				return returnValue, err
+			}
 		} else {
 			return returnValue, err
 		}
 	}
-	return "", nil
 }
 
 // Create will create a new path, or exit with error should the path exist.

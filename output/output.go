@@ -58,13 +58,13 @@ func (p TxtPrinter) PrintArray(stringArray []string) {
 
 type JSONPrinter struct{}
 
-func (p JSONPrinter) Printf(format string, a ...interface{}) {
+func (JSONPrinter) Printf(format string, a ...interface{}) {
 	s := fmt.Sprintf(format, a...)
 	b, _ := json.Marshal(s)
 	fmt.Fprintln(Out, string(b))
 }
 
-func (_ JSONPrinter) PrintArray(stringArray []string) {
+func (JSONPrinter) PrintArray(stringArray []string) {
 	s, _ := json.Marshal(stringArray)
 	fmt.Fprintln(Out, string(s))
 }

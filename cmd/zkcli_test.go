@@ -89,6 +89,7 @@ func TestCRUD(t *testing.T) {
 	require.NoError(err)
 	defer id.KillRemove()
 	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
+	require.Nil(err)
 	defer zkConn.Close()
 	hostsArg := strings.Join(hosts, ",")
 
@@ -175,6 +176,7 @@ func TestCRUDRecurisve(t *testing.T) {
 	require.NoError(err)
 	defer id.KillRemove()
 	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
+	require.Nil(err)
 	defer zkConn.Close()
 	hostsArg := strings.Join(hosts, ",")
 
@@ -262,6 +264,7 @@ func TestCreate(t *testing.T) {
 	require.NoError(err)
 	defer id.KillRemove()
 	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
+	require.Nil(err)
 	defer zkConn.Close()
 	hostsArg := strings.Join(hosts, ",")
 
@@ -332,6 +335,7 @@ func TestSet(t *testing.T) {
 	require.NoError(err)
 	defer id.KillRemove()
 	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
+	require.Nil(err)
 	defer zkConn.Close()
 	hostsArg := strings.Join(hosts, ",")
 
@@ -378,6 +382,7 @@ func TestRoot(t *testing.T) {
 	require.NoError(err)
 	defer id.KillRemove()
 	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
+	require.Nil(err)
 	defer zkConn.Close()
 	hostsArg := strings.Join(hosts, ",")
 
@@ -455,6 +460,7 @@ func TestGet(t *testing.T) {
 	require.NoError(err)
 	defer id.KillRemove()
 	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
+	require.Nil(err)
 	defer zkConn.Close()
 	hostsArg := strings.Join(hosts, ",")
 
@@ -474,6 +480,7 @@ func TestExists(t *testing.T) {
 	require.NoError(err)
 	defer id.KillRemove()
 	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
+	require.Nil(err)
 	defer zkConn.Close()
 	hostsArg := strings.Join(hosts, ",")
 
@@ -494,6 +501,7 @@ func TestLs(t *testing.T) {
 	require.NoError(err)
 	defer id.KillRemove()
 	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
+	require.Nil(err)
 	defer zkConn.Close()
 	hostsArg := strings.Join(hosts, ",")
 
@@ -595,6 +603,7 @@ func TestAcls(t *testing.T) {
 	require.NoError(err)
 	defer id.KillRemove()
 	zkConn, _, err := zookeeper.Connect(hosts, time.Hour)
+	require.Nil(err)
 	defer zkConn.Close()
 	hostsArg := strings.Join(hosts, ",")
 
@@ -644,7 +653,7 @@ func TestAcls(t *testing.T) {
 	err = rootCmd.Execute()
 	require.Error(err)
 
-	output, _ = loadDefaultValues()
+	loadDefaultValues()
 	rootCmd.SetArgs([]string{setAclCommandUse, testPath, acls2, "--" + serverFlag, hostsArg})
 	err = rootCmd.Execute()
 	require.NoError(err)

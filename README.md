@@ -1,6 +1,8 @@
 # zkcli
 
+[![Build Status](https://travis-ci.org/fJancsoSzabo/zkcli.svg?branch=master)](https://travis-ci.org/fJancsoSzabo/zkcli)
 [![codecov](https://codecov.io/gh/fJancsoSzabo/zkcli/branch/master/graph/badge.svg)](https://codecov.io/gh/fJancsoSzabo/zkcli)
+[![Go Report Card](https://goreportcard.com/badge/github.com/fJancsoSzabo/zkcli)](https://goreportcard.com/report/github.com/fJancsoSzabo/zkcli)
 
 Elegant, fast, and dependable CLI for ZooKeeper
 
