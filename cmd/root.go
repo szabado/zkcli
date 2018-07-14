@@ -69,10 +69,12 @@ var (
 	client *zk.ZooKeeper
 	out    output.Printer
 	stdin  io.Reader
+	osExit func(code int)
 )
 
 func init() {
 	stdin = os.Stdin
+	osExit = os.Exit
 
 	rootCmd.PersistentFlags().StringVar(&servers, serverFlag, defaultServer, "srv1[:port1][,srv2[:port2]...]")
 	rootCmd.PersistentFlags().BoolVar(&force, forceFlag, defaultForce, "force operation")
@@ -141,6 +143,6 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		osExit(1)
 	}
 }

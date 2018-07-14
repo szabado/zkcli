@@ -45,6 +45,10 @@ func loadDefaultValues() (stdoutBuf *bytes.Buffer, stdinBuf *bytes.Buffer) {
 	concurrentRequests = defaultConcurrentRequests
 	path = defaultPath
 
+	osExit = func(code int) {
+		panic("unexpected os.Exit: called with %v")
+	}
+
 	client = nil
 	out = nil
 	stdoutBuf = new(bytes.Buffer)
@@ -418,7 +422,12 @@ func TestRoot(t *testing.T) {
 	assert.NotNil(stat)
 	assert.Equal("even more data!", string(value))
 
-	// debug flag and an extra slash at the end of the path
+	// Specify an invalid output format
+	rootCmd.SetArgs([]string{lsrCommandUse, "/", "--" + serverFlag, hostsArg, "--" + formatFlag, "Fred Gandy"})
+	err = rootCmd.Execute()
+	require.Error(err)
+
+	// test the Execute command that calls root.Execute during regular execution
 	loadDefaultValues()
 	rootCmd.SetArgs([]string{createCommandUse, "/path/nested/2", "--" + debugFlag, "--" + serverFlag, hostsArg, "most data"})
 	Execute()
@@ -427,6 +436,16 @@ func TestRoot(t *testing.T) {
 	require.NoError(err)
 	require.NotNil(stat)
 	assert.Equal("most data", string(value))
+
+	// test the Execute command with an error
+	loadDefaultValues()
+	rootCmd.SetArgs([]string{getCommandUse, "/../invalidpath", "--" + serverFlag, hostsArg})
+	assert.PanicsWithValue(
+		"unexpected os.Exit: called with %v",
+		func() {
+			Execute()
+		},
+	)
 }
 
 func TestGet(t *testing.T) {
