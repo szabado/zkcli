@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 
 	"github.com/fJancsoSzabo/zkcli/output"
 	"github.com/fJancsoSzabo/zkcli/zk"
@@ -42,6 +43,10 @@ const (
 	defaultPath               = ""
 	defaultForce              = false
 	defaultServer             = ""
+
+	serverEnv = "ZKCLI_SERVERS"
+	authUserEnv = "ZKCLI_AUTH_USER"
+	authPwdEnv = "ZKCLI_AUTH_PWD"
 )
 
 const (
@@ -76,15 +81,18 @@ func init() {
 	stdin = os.Stdin
 	osExit = os.Exit
 
-	rootCmd.PersistentFlags().StringVar(&servers, serverFlag, defaultServer, "srv1[:port1][,srv2[:port2]...]")
+	rootCmd.PersistentFlags().StringVar(&servers, serverFlag, defaultServer, "srv1[:port1][,srv2[:port2]...] (Can be configured with the environment variable " + serverEnv + ")")
 	rootCmd.PersistentFlags().BoolVar(&force, forceFlag, defaultForce, "force operation")
 	rootCmd.PersistentFlags().StringVar(&format, formatFlag, defaultFormat, "output format ("+txtFormat+"|"+jsonFormat+")")
 	rootCmd.PersistentFlags().BoolVar(&omitNewline, omitNewlineFlag, defaultOmitnewline, "omit trailing newline")
 	rootCmd.PersistentFlags().BoolVar(&verbose, verboseFlag, defaultVerbose, "verbose")
 	rootCmd.PersistentFlags().BoolVar(&debug, debugFlag, defaultDebug, "debug mode (very verbose)")
-	rootCmd.PersistentFlags().StringVar(&authUser, authUserFlag, defaultAuthUser, "optional, digest scheme, user")
-	rootCmd.PersistentFlags().StringVar(&authPwd, authPwdFlag, defaultAuthPwd, "optional, digest scheme, pwd")
+	rootCmd.PersistentFlags().StringVar(&authUser, authUserFlag, defaultAuthUser, "optional, digest scheme, user (Can be configured with the environment variable " + authUserEnv + ")")
+	rootCmd.PersistentFlags().StringVar(&authPwd, authPwdFlag, defaultAuthPwd, "optional, digest scheme, pwd (Can be configured with the environment variable " + authPwdEnv + ")")
 
+	viper.BindEnv(serverFlag, serverEnv)
+	viper.BindEnv(authUserFlag, authUserEnv)
+	viper.BindEnv(authPwdFlag, authPwdEnv)
 }
 
 var rootCmd = &cobra.Command{
@@ -108,6 +116,16 @@ var rootCmd = &cobra.Command{
 			out = &output.JSONPrinter{}
 		default:
 			return errors.Errorf("unknown output type %s", format)
+		}
+
+		if vp := viper.Get(serverFlag); servers == "" && vp != nil {
+			servers = vp.(string)
+		}
+		if vp := viper.Get(authUserFlag); authUser == "" && vp != nil {
+			authUser = vp.(string)
+		}
+		if vp := viper.Get(authPwdFlag); authPwd == "" && vp != nil {
+			authPwd = vp.(string)
 		}
 
 		serversArray := strings.Split(servers, ",")
