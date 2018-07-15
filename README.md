@@ -25,32 +25,42 @@ Usage:
   zkcli [command]
 
 Available Commands:
-  create      
-  creater     
-  delete      
-  deleter     
-  exists      
-  get         
-  getacl      
+  create      Create the specified znode
+  creater     Create the specified znode, as well as any required parents
+  delete      Delete the specified znode
+  deleter     Delete the specified znode, as well as any children
+  exists      Check if the specified znode exists
+  get         Get the value of the specified znode
+  getacl      Get the ACL associated with a znode
   help        Help about any command
-  ls          
-  lsr         
-  rm          
-  rmr         
-  set         
-  setacl      
+  ls          Get the children of the specified znode
+  lsr         Print the children of the current znode recursively
+  set         Set the value of the specified znode
+  setacl      Set the ACL of the specified znode
 
 Flags:
-      --auth_pwd string   optional, digest scheme, pwd
-      --auth_usr string   optional, digest scheme, user
+      --auth_pwd string   optional, digest scheme, pwd (Can be configured with the environment variable ZKCLI_AUTH_PWD)
+      --auth_usr string   optional, digest scheme, user (Can be configured with the environment variable ZKCLI_AUTH_USER)
       --debug             debug mode (very verbose)
       --force             force operation
       --format string     output format (txt|json) (default "txt")
   -h, --help              help for zkcli
       --n                 omit trailing newline
-      --servers string    srv1[:port1][,srv2[:port2]...]
+      --servers string    srv1[:port1][,srv2[:port2]...] (Can be configured with the environment variable ZKCLI_SERVERS)
       --verbose           verbose
+
+Use "zkcli [command] --help" for more information about a command.
 ```
+
+#### Configuration
+
+There are environment variables that can be used instead of command line flags, to reduce the amount that has to be entered
+
+| Flag        | Environment Variable |
+|-------------|----------------------|
+| `--servers`   | `ZKCLI_SERVERS`        |
+| `--auth_user` | `ZKCLI_AUTH_USER`      |
+| `--auth_pwd`  | `ZKCLI_AUTH_PWD`       |
 
 ### Examples:
 
