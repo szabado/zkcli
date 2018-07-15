@@ -14,7 +14,7 @@ func init() {
 }
 
 var lsrCmd = &cobra.Command{
-	Use:   lsrCommandUse,
+	Use:   lsrCommandUse + " <path>",
 	Short: "Print the children of the current znode recursively",
 	RunE:  lsrExecute,
 }
