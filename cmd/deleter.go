@@ -15,7 +15,7 @@ func init() {
 }
 
 var deleterCmd = &cobra.Command{
-	Use:     deleterCommandUse,
+	Use:     deleterCommandUse + " <path>",
 	Short:   "Delete the specified znode, as well as any children",
 	Aliases: []string{"rmr"},
 	RunE:    deleterExecute,

@@ -19,7 +19,7 @@ func init() {
 }
 
 var setCmd = &cobra.Command{
-	Use:   setCommandUse,
+	Use:   setCommandUse + " <path> <data>",
 	Short: "Set the value of the specified znode",
 	PreRunE: func(_ *cobra.Command, args []string) error {
 		if len(args) >= 2 {

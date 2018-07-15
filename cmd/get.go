@@ -13,7 +13,7 @@ func init() {
 }
 
 var getCmd = &cobra.Command{
-	Use:   getCommandUse,
+	Use:   getCommandUse + " <path>",
 	Short: "Get the value of the specified znode",
 	RunE:  getExecute,
 }

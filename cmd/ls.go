@@ -13,7 +13,7 @@ func init() {
 }
 
 var lsCmd = &cobra.Command{
-	Use:   lsCommandUse,
+	Use:   lsCommandUse + " <path>",
 	Short: "Get the children of the specified znode",
 	RunE:  lsExecute,
 }

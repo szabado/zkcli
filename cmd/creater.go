@@ -16,7 +16,7 @@ func init() {
 }
 
 var createrCmd = &cobra.Command{
-	Use:   createrCommandUse,
+	Use:   createrCommandUse + " <path> [acls]",
 	Short: "Create the specified znode, as well as any required parents",
 	RunE:  createrExecute,
 }
