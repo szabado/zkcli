@@ -13,8 +13,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/fJancsoSzabo/zkcli/output"
-	"github.com/fJancsoSzabo/zkcli/zk"
+	"github.com/szabado/zkcli/output"
+	"github.com/szabado/zkcli/zk"
 )
 
 const (

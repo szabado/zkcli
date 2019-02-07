@@ -3,7 +3,7 @@
 set -eux
 
 export GOPATH="$(pwd)/.gobuild"
-SRCDIR="${GOPATH}/src/github.com/fJancsoSzabo/zkcli"
+SRCDIR="${GOPATH}/src/github.com/szabado/zkcli"
 
 [[ -d "${GOPATH}" ]] && rm -rf ${GOPATH}
 tar -czf archive.tar.gz .
