@@ -24,7 +24,7 @@ var deleterCmd = &cobra.Command{
 func deleterExecute(cmd *cobra.Command, _ []string) error {
 	if !force {
 		force = true
-		log.Warn("%v command requires --force for safety measure", cmd.Use)
+		log.Warnf("%v command requires --force for safety measure", cmd.Use)
 	}
 
 	return client.DeleteRecursive(path, concurrentRequests)

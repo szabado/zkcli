@@ -17,8 +17,8 @@ import (
 	a "github.com/stretchr/testify/assert"
 	r "github.com/stretchr/testify/require"
 
-	"github.com/fJancsoSzabo/zkcli/output"
-	"github.com/fJancsoSzabo/zkcli/zk"
+	"github.com/szabado/zkcli/output"
+	"github.com/szabado/zkcli/zk"
 )
 
 const (
@@ -29,7 +29,7 @@ type logger struct {
 }
 
 func (l *logger) Printf(message string, values ...interface{}) {
-	logrus.StandardLogger().Infof(message, values)
+	logrus.StandardLogger().Infof(message, values...)
 }
 
 func loadDefaultValues() (stdoutBuf *bytes.Buffer, stdinBuf *bytes.Buffer) {

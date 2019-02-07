@@ -1,8 +1,8 @@
 # zkcli
 
-[![Build Status](https://travis-ci.org/fJancsoSzabo/zkcli.svg?branch=master)](https://travis-ci.org/fJancsoSzabo/zkcli)
-[![codecov](https://codecov.io/gh/fJancsoSzabo/zkcli/branch/master/graph/badge.svg)](https://codecov.io/gh/fJancsoSzabo/zkcli)
-[![Go Report Card](https://goreportcard.com/badge/github.com/fJancsoSzabo/zkcli)](https://goreportcard.com/report/github.com/fJancsoSzabo/zkcli)
+[![Build Status](https://travis-ci.org/szabado/zkcli.svg?branch=master)](https://travis-ci.org/szabado/zkcli)
+[![codecov](https://codecov.io/gh/szabado/zkcli/branch/master/graph/badge.svg)](https://codecov.io/gh/szabado/zkcli)
+[![Go Report Card](https://goreportcard.com/badge/github.com/szabado/zkcli)](https://goreportcard.com/report/github.com/szabado/zkcli)
 
 Elegant, fast, and dependable CLI for ZooKeeper
 
@@ -165,9 +165,9 @@ single-threaded nature.
 
 ### License
 
-Release under the [Apache 2.0 license](https://github.com/fJancsoSzabo/zkcli/blob/master/LICENSE)
+Release under the [Apache 2.0 license](https://github.com/szabado/zkcli/blob/master/LICENSE)
 
-Authored by [Felix Jancso-Szabo](https://github.com/fJancsoSzabo) and [Shlomi Noach](https://github.com/shlomi-noach), among others.
+Authored by [Felix Jancso-Szabo](https://github.com/szabado) and [Shlomi Noach](https://github.com/shlomi-noach), among others.
  
  
  

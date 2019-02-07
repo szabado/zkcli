@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/fJancsoSzabo/zkcli/cmd"
+	"github.com/szabado/zkcli/cmd"
 )
 
 func main() {
