@@ -157,7 +157,7 @@ $ zkcli --servers srv-1,srv-2,srv-3 -force setacl /demo_acl_create "world:anyone
 ```
 
 This tool was build because the original [zookeepercli](https://github.com/outbrain/zookeepercli)
-has an incredibly verbose interface interface, very little testing, and
+has an incredibly verbose interface, very little testing, and
 struggles when dealing with recursive operations on large zookeeper instances due to its
 single-threaded nature.
 
