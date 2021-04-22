@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/szabado/zkcli.svg?branch=master)](https://travis-ci.org/szabado/zkcli)
 [![codecov](https://codecov.io/gh/szabado/zkcli/branch/master/graph/badge.svg)](https://codecov.io/gh/szabado/zkcli)
 [![Go Report Card](https://goreportcard.com/badge/github.com/szabado/zkcli)](https://goreportcard.com/report/github.com/szabado/zkcli)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fszabado%2Fzkcli.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fszabado%2Fzkcli?ref=badge_shield)
 
 Elegant, fast, and dependable CLI for ZooKeeper
 
@@ -174,3 +175,6 @@ Authored by [Felix Jancso-Szabo](https://github.com/szabado) and [Shlomi Noach](
  
 
  
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fszabado%2Fzkcli.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fszabado%2Fzkcli?ref=badge_large)
