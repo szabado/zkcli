@@ -156,12 +156,8 @@ digest:someuser:hashedpw:cdrwa
 $ zkcli --servers srv-1,srv-2,srv-3 -force setacl /demo_acl_create "world:anyone:rw,digest:someuser:hashedpw:crdwa"
 ```
 
-This tool was build because the original [zookeepercli](https://github.com/outbrain/zookeepercli)
-has an incredibly verbose interface, very little testing, and
-struggles when dealing with recursive operations on large zookeeper instances due to its
-single-threaded nature.
-
-**zkcli** aims to be nicer to use, faster, and be more rigorously tested.
+A fork of [zookeepercli](https://github.com/outbrain/zookeepercli) with a less verbose interface and more concurrency
+to perform operations on large zookeeper instances.
 
 ### License
 
