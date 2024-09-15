@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"io/ioutil"
+	"io"
 
 	"github.com/spf13/cobra"
 )
@@ -26,7 +26,7 @@ var setCmd = &cobra.Command{
 			data = []byte(args[1])
 		} else {
 			var err error
-			data, err = ioutil.ReadAll(stdin)
+			data, err = io.ReadAll(stdin)
 			if err != nil {
 				return err
 			}
