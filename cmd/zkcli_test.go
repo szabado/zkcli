@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ory/dockertest"
+	// "github.com/ory/dockertest"
 	zookeeper "github.com/samuel/go-zookeeper/zk"
 	"github.com/sirupsen/logrus"
 	a "github.com/stretchr/testify/assert"
@@ -71,20 +71,20 @@ func (b *mockBufError) Read(p []byte) (n int, err error) {
 	panic(bytes.ErrTooLarge)
 }
 
-func StartServer() (hosts []string, id dockertest.ContainerID, err error) {
-	id, err = dockertest.ConnectToZooKeeper(10, ServerPollingInterval, func(url string) bool {
-		hosts = []string{url}
-		conn, _, err := zookeeper.Connect([]string{url}, time.Second, zookeeper.WithLogger(&logger{}))
-		if err != nil {
-			return false
-		}
-		conn.Close()
+// func StartServer() (hosts []string, id dockertest.ContainerID, err error) {
+// 	id, err = dockertest.ConnectToZooKeeper(10, ServerPollingInterval, func(url string) bool {
+// 		hosts = []string{url}
+// 		conn, _, err := zookeeper.Connect([]string{url}, time.Second, zookeeper.WithLogger(&logger{}))
+// 		if err != nil {
+// 			return false
+// 		}
+// 		conn.Close()
 
-		return true
-	})
+// 		return true
+// 	})
 
-	return hosts, id, err
-}
+// 	return hosts, id, err
+// }
 
 func TestCRUD(t *testing.T) {
 	require := r.New(t)
