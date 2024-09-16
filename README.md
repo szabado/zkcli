@@ -1,10 +1,8 @@
 # zkcli
 
-[![Build Status](https://travis-ci.org/szabado/zkcli.svg?branch=master)](https://travis-ci.org/szabado/zkcli)
-[![codecov](https://codecov.io/gh/szabado/zkcli/branch/master/graph/badge.svg)](https://codecov.io/gh/szabado/zkcli)
 [![Go Report Card](https://goreportcard.com/badge/github.com/szabado/zkcli)](https://goreportcard.com/report/github.com/szabado/zkcli)
 
-Elegant, fast, and dependable CLI for ZooKeeper
+Elegant, fast, and dependable CLI for ZooKeeper.
 
 **zkcli** is a non-interactive command line client for [ZooKeeper](http://zookeeper.apache.org/). It provides with:
 
@@ -12,11 +10,7 @@ Elegant, fast, and dependable CLI for ZooKeeper
  * Extended operations: `lsr` (ls recursive), `creater` (create recursively), `deleter` (aka `rmr`, delete recursively)
  * Well formatted and controlled output: supporting either `txt` or `json` format
 
-### Download & Install
-
-The source code is freely available; you will need `git` installed as well as `go` and `dep`.
-
-### Usage:
+## Usage:
 ```
 $ zkcli --help
 A CLI to interact with Zookeeper
@@ -52,7 +46,7 @@ Flags:
 Use "zkcli [command] --help" for more information about a command.
 ```
 
-#### Configuration
+### Configuration
 
 There are environment variables that can be used instead of command line flags, to reduce the amount that has to be entered
 
@@ -62,7 +56,7 @@ There are environment variables that can be used instead of command line flags, 
 | `--auth_user` | `ZKCLI_AUTH_USER`      |
 | `--auth_pwd`  | `ZKCLI_AUTH_PWD`       |
 
-### Examples:
+## Examples:
 
 ```
 $ zkcli --servers srv-1,srv-2,srv-3 create /demo_only some_value
@@ -156,10 +150,20 @@ digest:someuser:hashedpw:cdrwa
 $ zkcli --servers srv-1,srv-2,srv-3 -force setacl /demo_acl_create "world:anyone:rw,digest:someuser:hashedpw:crdwa"
 ```
 
-A fork of [zookeepercli](https://github.com/outbrain/zookeepercli) with a less verbose interface and more concurrency
-to perform operations on large zookeeper instances.
+## Installation
 
-### License
+### Homebrew
+1. `brew tap szabado/tools`
+2. `brew install szabado/tools/zkcli`
+
+### Build from source
+
+This tool is built using [Hermit](https://github.com/cashapp/hermit), and fetches its own build tools as part of its build process. To build this from source:
+1. Download the source.
+2. Run `./bin/go build`
+3. Put the resultant `zkcli` binary in your `PATH`
+
+## License
 
 Release under the [Apache 2.0 license](https://github.com/szabado/zkcli/blob/master/LICENSE)
 
