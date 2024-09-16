@@ -2,6 +2,8 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/szabado/zkcli)](https://goreportcard.com/report/github.com/szabado/zkcli)
 
+# This has been moved to the [go-tools](https://github.com/szabado/go-tools) monorepo.
+
 Elegant, fast, and dependable CLI for ZooKeeper.
 
 **zkcli** is a non-interactive command line client for [ZooKeeper](http://zookeeper.apache.org/). It provides with:
