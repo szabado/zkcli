@@ -1,6 +1,7 @@
 # zkcli
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/szabado/zkcli)](https://goreportcard.com/report/github.com/szabado/zkcli)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fszabado%2Fzkcli.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fszabado%2Fzkcli?ref=badge_shield)
 
 # This has been moved to the [go-tools](https://github.com/szabado/go-tools) monorepo.
 
@@ -176,3 +177,6 @@ Authored by [Felix Jancso-Szabo](https://github.com/szabado) and [Shlomi Noach](
  
 
  
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fszabado%2Fzkcli.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fszabado%2Fzkcli?ref=badge_large)
